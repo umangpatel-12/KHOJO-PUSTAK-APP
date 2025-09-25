@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "637493652352",
+    "project_id": "khojopustak",
+    "storage_bucket": "khojopustak.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:637493652352:android:b7401f8477d0e7f13f6f65",
+        "android_client_info": {
+          "package_name": "com.example.khojpustak.khojpustak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvrG0i3Tb2Z6BArfkPBww4OwQOgm4rfUY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
