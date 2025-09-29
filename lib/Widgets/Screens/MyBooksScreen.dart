@@ -82,18 +82,23 @@ class _MyBooksScreenState extends State<MyBooksScreen> {
     isSelling ? sellingBooks : boughtBooks;
 
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white60,
+        shadowColor: Colors.black12,
+        elevation: 1,
+        title: Text(
+          "My Books",
+          style: TextStyle(
+            fontSize: 22,
+            color: Colors.green,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 15),
-            const Center(
-              child: Text(
-                "My Books",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 15),
-
             // Earnings Card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 12),

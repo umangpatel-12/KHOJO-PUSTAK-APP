@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'BookDetailsScreen.dart';
 import 'CategoryScreen.dart';
 import 'Widgets/InfoCard.dart';
 
@@ -217,6 +218,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
+              //Book Cards
+
               Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 4,
@@ -227,16 +230,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Image section with Wishlist icon
                     Stack(
                       children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
-                          ),
-                          child: Image.network(
-                            "https://images.unsplash.com/photo-1553729784-e91953dec042",
-                            height: 160,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, _createRoute(BookDetailsScreen()));
+                          },
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            child: Image.network(
+                              "https://images.unsplash.com/photo-1553729784-e91953dec042",
+                              height: 160,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
 
@@ -259,24 +267,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                         // Wishlist Heart Icon
-                        Positioned(
-                          top: 2,
-                          right: 8,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isWishlisted = !isWishlisted;
-                              });
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              child: Icon(
-                                isWishlisted ? Icons.favorite : Icons.favorite_border,
-                                color: isWishlisted ? Colors.red : Colors.grey,
-                              ),
-                            ),
-                          ),
-                        ),
+
+                        // Positioned(
+                        //   top: 2,
+                        //   right: 8,
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       setState(() {
+                        //         isWishlisted = !isWishlisted;
+                        //       });
+                        //     },
+                        //     child: CircleAvatar(
+                        //       backgroundColor: Colors.transparent,
+                        //       child: Icon(
+                        //         isWishlisted ? Icons.favorite : Icons.favorite_border,
+                        //         color: isWishlisted ? Colors.red : Colors.grey,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
