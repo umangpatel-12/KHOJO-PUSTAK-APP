@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'BookDetailsScreen.dart';
 import 'CategoryScreen.dart';
 import 'Widgets/InfoCard.dart';
+import '../../Controller/banner_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,13 +13,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final bool isLoggedIn;
+  late final bool isLoggedIn; 
+  final BannerController _bannerController = BannerController(); // Initialize here
 
-  bool isWishlisted = false; // default false
-
+  bool isWishlisted = false;
   Color myGreenColor = const Color(0xFF06923E);
-
-  // Halka shade
   late final Color lightGreen = Color.lerp(myGreenColor, Colors.white, 0.4)!;
 
   final List<Map<String, dynamic>> categories = [
@@ -46,6 +46,19 @@ class _HomeScreenState extends State<HomeScreen> {
       "textColor": Colors.orange,
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    isLoggedIn = false; // Example: Default to false if not logged in.
+    _bannerController.init(); // Call init on the already created controller
+  }
+
+  @override
+  void dispose() {
+    _bannerController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +92,115 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
       
               // ===== Banner / Container =====
-              Container(
-                color: lightGreen,
-                height: 200,
-                child: const Center(child: Text("Your content here")),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: AnimatedBuilder(
+                  animation: _bannerController,
+                  builder: (context, child) {
+                    // Handle loading state first
+                    if (_bannerController.isLoading) {
+                      return Container( // Maintain consistent height and styling
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200], // Placeholder color for loading
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    // After loading, check if there are images
+                    if (_bannerController.bannerImageUrls.isEmpty) {
+                      return Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: lightGreen, // Your original placeholder color
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: const Center(child: Text("No banner images available")),
+                      );
+                    }
+                    // If not loading and images are present, show the PageView
+                    return SizedBox(
+                      height: 200,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          PageView.builder(
+                            controller: _bannerController.pageController,
+                            itemCount: _bannerController.bannerImageUrls.length,
+                            onPageChanged: _bannerController.onPageChanged,
+                            itemBuilder: (context, index) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(12.0),
+                                child: Image.network(
+                                  _bannerController.bannerImageUrls[index],
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (BuildContext context, Widget child,
+                                      ImageChunkEvent? loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (BuildContext context, Object exception,
+                                      StackTrace? stackTrace) {
+                                    // Print the exception to the console for more details if needed
+                                    print("Image loading error in UI for URL: ${_bannerController.bannerImageUrls[index]}");
+                                    print("Image loading exception: $exception");
+                                    print("Image loading stackTrace: $stackTrace");
+
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(12.0),
+                                        border: Border.all(color: Colors.red.shade200),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Error loading image:\n${exception.toString()}',
+                                            style: TextStyle(color: Colors.red.shade700, fontSize: 12),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          // Page Indicators
+                          Positioned(
+                            bottom: 10.0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(_bannerController.bannerImageUrls.length, (index) {
+                                return Container(
+                                  width: 8.0,
+                                  height: 8.0,
+                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _bannerController.currentPage == index
+                                        ? myGreenColor
+                                        : Colors.grey[400],
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
       
               // =============== Category Section ============= //
@@ -123,12 +241,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
       
-                    // 👇 Row ke bilkul neeche GridView
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: categories.length,
-                      padding: EdgeInsets.only(top: 5),
+                      padding: const EdgeInsets.only(top: 5),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 12,
@@ -137,8 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       itemBuilder: (context, index) {
                         final category = categories[index];
-                        return
-                          InkWell(
+                        return InkWell(
                           highlightColor: Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {},
@@ -219,7 +335,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               //Book Cards
-
               Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 4,
@@ -227,7 +342,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image section with Wishlist icon
                     Stack(
                       children: [
                         GestureDetector(
@@ -240,15 +354,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               topRight: Radius.circular(12),
                             ),
                             child: Image.network(
-                              "https://images.unsplash.com/photo-1553729784-e91953dec042",
+                              "https://images.unsplash.com/photo-1553729784-e91953dec042", // Placeholder, replace with actual book image
                               height: 160,
                               width: double.infinity,
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
-
-                        // Bestseller Tag
                         Positioned(
                           top: 8,
                           left: 8,
@@ -265,31 +377,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-
-                        // Wishlist Heart Icon
-
-                        // Positioned(
-                        //   top: 2,
-                        //   right: 8,
-                        //   child: GestureDetector(
-                        //     onTap: () {
-                        //       setState(() {
-                        //         isWishlisted = !isWishlisted;
-                        //       });
-                        //     },
-                        //     child: CircleAvatar(
-                        //       backgroundColor: Colors.transparent,
-                        //       child: Icon(
-                        //         isWishlisted ? Icons.favorite : Icons.favorite_border,
-                        //         color: isWishlisted ? Colors.red : Colors.grey,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
-
-                    // Info section
                     Padding(
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -303,38 +392,33 @@ class _HomeScreenState extends State<HomeScreen> {
                             visualDensity: VisualDensity.compact,
                           ),
                           const SizedBox(height: 6),
-
-                          Text(
-                            "Ramauan",
-                            style: const TextStyle(
+                          const Text(
+                            "Ramauan", // Placeholder book title
+                            style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          Text("by Rakesh",
-                              style: const TextStyle(color: Colors.grey)),
-
+                          const Text("by Rakesh", // Placeholder author
+                              style: TextStyle(color: Colors.grey)),
                           const SizedBox(height: 6),
-
                           Row(
-                            children: [
-                              const Icon(Icons.star, color: Colors.orange, size: 18),
-                              const SizedBox(width: 4),
+                            children: const [
+                              Icon(Icons.star, color: Colors.orange, size: 18),
+                              SizedBox(width: 4),
                               Text("4.3"),
                               Text(" (20 reviews)",
-                                  style: const TextStyle(color: Colors.grey)),
+                                  style: TextStyle(color: Colors.grey)),
                             ],
                           ),
-
                           const SizedBox(height: 6),
-
                           Row(
                             children: [
-                              Text("₹399",
-                                  style: const TextStyle(
+                              const Text("₹399",
+                                  style: TextStyle(
                                       fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
                               const SizedBox(width: 6),
-                              Text(
+                              const Text(
                                 "₹599",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Colors.grey,
                                     decoration: TextDecoration.lineThrough),
                               ),
@@ -371,19 +455,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.green[50],
                 child: Column(
                   children: [
-                    // First Row
                     Row(
-                      children: [
+                      children: const [
                         Expanded(
                           child: InfoCard(
                             title: '10,000+',
                             subtitle: 'Books Available',
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         Expanded(
                           child: InfoCard(
-                            title: '50,000+',
+                            title: '50,000+', // Example data
                             subtitle: 'Happy Customers',
                           ),
                         ),
@@ -391,17 +474,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 20),
                     Row(
-                      children: [
+                      children: const [
                         Expanded(
                           child: InfoCard(
-                            title: '24/7',
+                            title: '24/7',  // Example data
                             subtitle: 'Customer Support',
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         Expanded(
                           child: InfoCard(
-                            title: 'Free',
+                            title: 'Free', // Example data
                             subtitle: 'Delivery Available',
                           ),
                         ),
@@ -423,7 +506,6 @@ Route _createRoute(Widget page) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      // Slide from right
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
       const curve = Curves.ease;
