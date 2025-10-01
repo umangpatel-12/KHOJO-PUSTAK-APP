@@ -2,8 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Navigation/BottomNavBar.dart';
-import '../Screens/HomeScreen.dart';
+import '../BottomNavigationBar/BottomNavBar.dart';
 import 'RegistrationScreen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -46,7 +45,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login Successful ✅")),
         );
-        Navigator.push(context, _createRoute(BottomNavBar()));
+        // Navigator.push(context, _createRoute(BottomNavBar()));
+        Navigator.push(context, _createRoute(CustomBottomNavBar()));
       }
       on FirebaseAuthException catch (e) {
         String message = "";

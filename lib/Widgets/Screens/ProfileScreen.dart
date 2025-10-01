@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:khojpustak/Widgets/Authentication/LoginScreen.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'Widgets/ProfileCard.dart';
 
@@ -12,6 +15,16 @@ class Profilescreen extends StatefulWidget {
 }
 
 class _ProfilescreenState extends State<Profilescreen> {
+
+  Future<void> _Logout() async {
+    await FirebaseAuth.instance.signOut();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Logout Successfully Completed ✅")),
+    );
+    Navigator.push(context, _createRoute(LoginScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,6 +225,14 @@ class _ProfilescreenState extends State<Profilescreen> {
                               print("Location tapped");
                             },
                           ),
+                          ActivityTile(
+                            icon: CupertinoIcons.lock,
+                            title: "Forgot password",
+                            subtitle: "Change or reset your password",
+                            onTap: () {
+                              print("Location tapped");
+                            },
+                          ),
                         ],
                       ),
                     ],
@@ -246,6 +267,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                           subtitle: "Sign out of your account",
                           onTap: () {
                             // Action for My Orders
+                            _Logout();
                             print("Personal Information tapped");
                           },
                         ),
@@ -262,4 +284,25 @@ class _ProfilescreenState extends State<Profilescreen> {
       ),
     );
   }
+}
+
+
+Route _createRoute(Widget page) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => page,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      // Slide from right
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
 }

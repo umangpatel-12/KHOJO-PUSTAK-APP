@@ -5,7 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../Navigation/BottomNavBar.dart';
 import '../Screens/HomeScreen.dart';
 import 'LoginScreen.dart';
 
@@ -142,7 +141,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Registration Successful ✅")),
       );
-      Navigator.push(context, _createRoute(BottomNavBar()));
+      Navigator.push(context, _createRoute(BottomAppBar()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         ScaffoldMessenger.of(context).showSnackBar(
