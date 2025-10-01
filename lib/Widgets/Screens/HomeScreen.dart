@@ -1,9 +1,9 @@
-import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../Controller/banner_controller.dart';
 import 'BookDetailsScreen.dart';
 import 'CategoryScreen.dart';
 import 'Widgets/InfoCard.dart';
-import '../../Controller/banner_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -493,6 +493,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+
+              SizedBox(height: 70,)
             ],
           ),
         ),

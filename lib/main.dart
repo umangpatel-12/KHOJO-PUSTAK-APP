@@ -1,15 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:khojpustak/Widgets/Navigation/BottomNavBar.dart';
-import 'package:khojpustak/Widgets/Screens/HomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Widgets/Authentication/LoginScreen.dart';
 import 'Widgets/BottomNavigationBar/BottomNavBar.dart';
-import 'Widgets/Navigation/CustomBottomNav.dart';
 
 Future<void> main() async {
+
+
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences preferences = await SharedPreferences.getInstance();

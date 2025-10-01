@@ -69,7 +69,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false, // 👈 Prevent nav bar from moving
       body: Stack(
         children: [
           // ✅ Smooth page transition
@@ -90,9 +90,11 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             child: _pages[_selectedIndex],
           ),
 
-          // Floating Bottom Navigation Bar
-          Align(
-            alignment: Alignment.bottomCenter,
+          // ✅ Fixed Bottom Navigation Bar
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0, // 👈 Always stick at bottom
             child: Container(
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
