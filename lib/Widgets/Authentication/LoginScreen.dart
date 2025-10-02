@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigationBar/BottomNavBar.dart';
 import 'RegistrationScreen.dart';
@@ -16,6 +17,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
 
   bool _obscurePassword = true;
   bool _remember = false;
@@ -46,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SnackBar(content: Text("Login Successful ✅")),
         );
         // Navigator.push(context, _createRoute(BottomNavBar()));
-        Navigator.push(context, _createRoute(CustomBottomNavBar()));
+        Navigator.pushReplacement(context, _createRoute(CustomBottomNavBar()));
       }
       on FirebaseAuthException catch (e) {
         String message = "";
@@ -66,18 +70,64 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     }
-    // try {
-    //   final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-    //     email: _email.text.trim(),
-    //     password: _password.text.trim(),
-    //   );
-    //   // Navigate to Screens Page
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Login Successful ✅")),
-    //   );
-    //   Navigator.push(context, _createRoute(HomeScreen()));
-    // }
   }
+
+  // Google Sign In
+  Future<void> signInWithGoogle() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        // User cancelled
+        setState(() => _loading = false);
+        return;
+      }
+
+      // Get Google authentication
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // 🔹 Some versions only provide `idToken`, so we use that
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken, // only available on some platforms
+      );
+
+      // Firebase sign in
+      final userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        if (_remember) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('userEmail', userCredential.user!.email ?? '');
+          await prefs.setString('userName', userCredential.user!.displayName ?? '');
+          await prefs.setString('userPhoto', userCredential.user!.photoURL ?? '');
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Google Sign-In Successful ✅")),
+        );
+        Navigator.pushReplacement(context, _createRoute(CustomBottomNavBar()));
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google Sign-In Failed: ${e.message}")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error during Google Sign-In: $e")),
+      );
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+
 
   InputDecoration _decoration(String hint, IconData icon) {
     return InputDecoration(
@@ -278,26 +328,31 @@ class _LoginScreenState extends State<LoginScreen> {
                         // ✅ Sign In Button
                         SizedBox(
                           width: double.infinity,
-                          child:
-                          _loading ? CircularProgressIndicator() :
-                          ElevatedButton(
-                            onPressed: _remember
-                                ?  _userLogin
-                                : null,
+                          child: ElevatedButton(
+                            onPressed: _remember ? _userLogin : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryGreen,
                               foregroundColor: Colors.white,
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               textStyle: const TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 16),
                             ),
-                            child: const Text('Sign In'),
+                            child: _loading
+                                ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : const Text('Sign In'),
                           ),
                         ),
+
 
                         const SizedBox(height: 16),
 
@@ -322,14 +377,47 @@ class _LoginScreenState extends State<LoginScreen> {
                               "Google",
                               const Icon(Icons.g_mobiledata,
                                   color: Colors.black, size: 24),
-                                  () {},
+                              signInWithGoogle,
                             ),
+                      //       Expanded(
+                      //   child: OutlinedButton(
+                      //     onPressed: () async {
+                      //       final credential = await signInWithGoogle();
+                      //       if(credential != null)
+                      //         {
+                      //           ScaffoldMessenger.of(context).showSnackBar(
+                      //             SnackBar(
+                      //                 content: Text(
+                      //                     'Signed in as Google.')),
+                      //           );
+                      //           print("Google sign in with${credential.user!.email}");
+                      //           Navigator.pushReplacement(context, _createRoute(CustomBottomNavBar()));
+                      //         }
+                      //     },
+                      //     style: OutlinedButton.styleFrom(
+                      //       padding: const EdgeInsets.symmetric(vertical: 10),
+                      //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      //     ),
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         Icon(Icons.g_mobiledata,
+                      //         color: Colors.black, size: 24),
+                      //         const SizedBox(width: 8),
+                      //         Text("Google", style: const TextStyle(fontWeight: FontWeight.w600)),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+
                             const SizedBox(width: 12),
                             _socialButton(
                               "Facebook",
                               const Icon(Icons.facebook,
                                   color: Colors.black, size: 20),
-                                  () {},
+                                  () {
+                                     // TODO: Implement Facebook Sign In
+                                  },
                             ),
                           ],
                         ),

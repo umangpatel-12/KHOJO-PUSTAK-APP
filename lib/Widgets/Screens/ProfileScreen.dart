@@ -22,7 +22,7 @@ class _ProfilescreenState extends State<Profilescreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Logout Successfully Completed ✅")),
     );
-    Navigator.push(context, _createRoute(LoginScreen()));
+    Navigator.pushReplacement(context, _createRoute(LoginScreen()));
   }
 
   @override

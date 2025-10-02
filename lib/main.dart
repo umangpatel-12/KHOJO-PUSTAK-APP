@@ -7,7 +7,6 @@ import 'Widgets/BottomNavigationBar/BottomNavBar.dart';
 
 Future<void> main() async {
 
-
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences preferences = await SharedPreferences.getInstance();
