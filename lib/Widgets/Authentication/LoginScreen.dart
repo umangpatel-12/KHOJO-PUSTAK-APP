@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigationBar/BottomNavBar.dart';
 import 'RegistrationScreen.dart';
@@ -18,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
 
   bool _obscurePassword = true;
@@ -164,7 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      Scaffold(
       backgroundColor: const Color(0xFFF4FFF8),
       body: SafeArea(
         child: Center(
@@ -310,6 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             GestureDetector(
                               onTap: () {
                                 // handle forgot password
+                                Navigator.push(context, _createRoute(ForgotPasswordScreen()));
                               },
                               child: Text(
                                 "Forgot password?",
@@ -379,37 +382,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: Colors.black, size: 24),
                               signInWithGoogle,
                             ),
-                      //       Expanded(
-                      //   child: OutlinedButton(
-                      //     onPressed: () async {
-                      //       final credential = await signInWithGoogle();
-                      //       if(credential != null)
-                      //         {
-                      //           ScaffoldMessenger.of(context).showSnackBar(
-                      //             SnackBar(
-                      //                 content: Text(
-                      //                     'Signed in as Google.')),
-                      //           );
-                      //           print("Google sign in with${credential.user!.email}");
-                      //           Navigator.pushReplacement(context, _createRoute(CustomBottomNavBar()));
-                      //         }
-                      //     },
-                      //     style: OutlinedButton.styleFrom(
-                      //       padding: const EdgeInsets.symmetric(vertical: 10),
-                      //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      //     ),
-                      //     child: Row(
-                      //       mainAxisAlignment: MainAxisAlignment.center,
-                      //       children: [
-                      //         Icon(Icons.g_mobiledata,
-                      //         color: Colors.black, size: 24),
-                      //         const SizedBox(width: 8),
-                      //         Text("Google", style: const TextStyle(fontWeight: FontWeight.w600)),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-
                             const SizedBox(width: 12),
                             _socialButton(
                               "Facebook",
