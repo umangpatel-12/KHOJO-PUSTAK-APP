@@ -27,7 +27,8 @@ class ActivityTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         splashColor: Colors.black.withOpacity(0.2), // ripple color
         highlightColor: Colors.green.withOpacity(0.1), // pressed color
-        child: Padding(
+        child:
+        Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: ListTile(
             leading: Icon(icon, color: color),

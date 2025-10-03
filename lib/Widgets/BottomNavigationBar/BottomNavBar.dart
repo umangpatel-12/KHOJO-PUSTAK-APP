@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../Screens/CartScreen.dart';
 import '../Screens/HomeScreen.dart';
 import '../Screens/MyBooksScreen.dart';
-import '../Screens/ProfileScreen.dart';
+import '../Screens/Profile/ProfileScreen.dart';
 import '../Screens/SellScreen.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
@@ -28,6 +30,38 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  String location = "Fetching location...";
+
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermissionAndGetLocation();
+  }
+
+  Future<void> _requestLocationPermissionAndGetLocation() async {
+    // Request permission
+    var status = await Permission.location.request();
+
+    if (status.isGranted) {
+      // Permission granted, get location
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        location = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
+      });
+    } else if (status.isDenied) {
+      setState(() {
+        location = "Location permission denied";
+      });
+    } else if (status.isPermanentlyDenied) {
+      // Open app settings
+      setState(() {
+        location = "Permission permanently denied. Open settings to allow.";
+      });
+      openAppSettings();
+    }
   }
 
   Widget buildNavItem(IconData icon, String label, int index) {

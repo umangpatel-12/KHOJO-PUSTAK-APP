@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:khojpustak/Widgets/Authentication/LoginScreen.dart';
+import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/LocationScreen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import 'Widgets/ProfileCard.dart';
+import '../Widgets/ProfileCard.dart';
 
 class Profilescreen extends StatefulWidget {
   const Profilescreen({super.key});
@@ -160,7 +162,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                               print("Wishlist tapped");
                             },
                           ),
-
                           ActivityTile(
                             icon: Icons.history,
                             title: "Transaction History",
@@ -222,7 +223,8 @@ class _ProfilescreenState extends State<Profilescreen> {
                             title: "Location",
                             subtitle: "Updates your location's",
                             onTap: () {
-                              print("Location tapped");
+                              Navigator.push(context, _createRoute(LocationScreen()));
+                              // print("Location tapped");
                             },
                           ),
                           ActivityTile(
@@ -230,6 +232,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                             title: "Forgot password",
                             subtitle: "Change or reset your password",
                             onTap: () {
+                              Navigator.push(context, _createRoute(ForgotPasswordScreen()));
                               print("Location tapped");
                             },
                           ),
