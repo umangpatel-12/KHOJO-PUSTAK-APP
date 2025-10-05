@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:khojpustak/Widgets/Authentication/LoginScreen.dart';
 import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/EditProfileScreen.dart';
 import 'package:khojpustak/Widgets/Screens/Profile/LocationScreen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -17,6 +22,7 @@ class Profilescreen extends StatefulWidget {
 }
 
 class _ProfilescreenState extends State<Profilescreen> {
+  String? profilePic;
 
   Future<void> _Logout() async {
     await FirebaseAuth.instance.signOut();
@@ -32,69 +38,115 @@ class _ProfilescreenState extends State<Profilescreen> {
     return Scaffold(
       // backgroundColor: Colors.white60,
       appBar: AppBar(
-        centerTitle: true,
         backgroundColor: Colors.white,
-        shadowColor: Colors.black12,
-        elevation: 2,
+        shadowColor: Colors.black,
+        elevation: 0.2,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.green,size: 22),
         title: Text(
           "Profile",
           style: TextStyle(
-            fontSize: 22,
-            color: Colors.green,
-            fontWeight: FontWeight.w500,
+              fontSize: 18,
+              color: Colors.green,
+              fontWeight: FontWeight.w500
           ),
         ),
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
+        padding: const EdgeInsets.all(16),
         child: SizedBox(
           child: Column(
             children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          final XFile? picimage = await ImagePicker()
+                              .pickImage(
+                              source: ImageSource.gallery, imageQuality: 60,
+                          );
+                          if(picimage != null){
+                            setState(() {
+                              profilePic = picimage.path;
+                            });
+                          }
+                          print("Profile Pic");
+                        },
+                        child: Container(
+                          child: profilePic == null ?
+                          CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.black26,
+                            child: Image.asset(
+                              "assets/images/user_pic.png",
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                              :
+                          CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.black26,
+                            backgroundImage: FileImage(File(profilePic!)),
+                          ),
+                        ),
+                      ),
 
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundColor: Colors.black26,
-                    child: Image.asset(
-                      "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text("Rahul Sharma", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 4),
-                      // Row(
-                      //   children: [
-                      //     Icon(Icons.star, color: Colors.amber, size: 18),
-                      //     SizedBox(width: 4),
-                      //     Text("4.8 (127 reviews)", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                      //   ],
-                      // ),
-                      SizedBox(height: 4),
-                      Text("Mumbai, Maharashtra", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text("Rahul Sharma", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          // Row(
+                          //   children: [
+                          //     Icon(Icons.star, color: Colors.amber, size: 18),
+                          //     SizedBox(width: 4),
+                          //     Text("4.8 (127 reviews)", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                          //   ],
+                          // ),
+                          SizedBox(height: 4),
+                          Text("Mumbai, Maharashtra", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                        ],
+                      ),
+                      const Spacer(),
+                      OutlinedButton.icon(
+                          onPressed: (){},
+                          icon: const Icon(FontAwesomeIcons.edit, size: 14, color: Colors.green,),
+                          label: Text(
+                            "Edit",
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14
+                            ),
+                          ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.green, width: 1.5),
+                          padding: EdgeInsets.all(10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: Colors.green, width: 1.5),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  const Spacer(),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    onPressed: () {},
-                    child: const Text(
-                        "Edit",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
 
 
@@ -103,6 +155,7 @@ class _ProfilescreenState extends State<Profilescreen> {
               SizedBox(height: 16,),
 
               Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -215,6 +268,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                             subtitle: "Update your details",
                             onTap: () {
                               // Action for My Orders
+                              Navigator.push(context, _createRoute(EditProfileScreen()));
                               print("Personal Information tapped");
                             },
                           ),
