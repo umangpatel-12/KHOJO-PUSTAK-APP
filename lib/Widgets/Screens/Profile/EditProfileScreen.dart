@@ -24,7 +24,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _email = TextEditingController();
   final _phone = TextEditingController();
   final _dob = TextEditingController();
-  final _location = TextEditingController();
+  final _address = TextEditingController();
 
   File? _image;
   final picker = ImagePicker();
@@ -51,8 +51,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _email.text = data['email'] ?? user.email ?? '';
           _phone.text = data['phone'] ?? '';
           _dob.text = data['dob'] ?? '';
-          _location.text = data['location'] ?? '';
+          _address.text = data['location'] ?? '';
           profilePic = data['profilePic'];
+        });
+      }
+
+      final addressDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("location")
+          .doc(user.uid)
+          .get();
+      if (addressDoc.exists) {
+        final addressData  = addressDoc.data()!;
+        setState(() {
+          _address.text = addressData['address'] ?? '';
+        });
+      }
+      else{
+        setState(() {
+          _address.text = '';
         });
       }
     }
@@ -118,7 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'email': _email.text.trim(),
         'phone': _phone.text.trim(),
         'dob': _dob.text.trim(),
-        'location': _location.text.trim(),
+        // 'location': _address.text.trim(),
         'profilePic': uploadedUrl,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
@@ -149,7 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _email.dispose();
     _phone.dispose();
     _dob.dispose();
-    _location.dispose();
+    _address.dispose();
     super.dispose();
   }
 
@@ -286,6 +304,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
+                      readOnly: true,
                       controller: _email,
                       decoration: _buildDecoration(
                           'Enter your email', Icons.email_outlined),
@@ -375,22 +394,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Expanded(
                           flex: 3,
                           child: TextFormField(
-                            controller: _location,
+                            controller: _address,
                             readOnly: true,
                             decoration: InputDecoration(
-                              prefixIcon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  SizedBox(width: 10),
-                                  Icon(Icons.location_on_outlined,
-                                      color: Colors.grey),
-                                  SizedBox(width: 4),
-                                  Icon(Icons.arrow_right_alt_rounded,
-                                      color: Colors.grey, size: 22),
-                                ],
-                              ),
-                              prefixIconConstraints: const BoxConstraints(
-                                  minWidth: 0, minHeight: 0),
+                              prefixIcon: const Icon(Icons.location_on_outlined, color: Colors.grey),
                               hintText: 'Enter your location',
                               filled: true,
                               fillColor: Colors.grey[100],

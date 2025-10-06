@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigationBar/BottomNavBar.dart';
+import '../Screens/Widgets/ButtonLayout.dart';
 import 'RegistrationScreen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -51,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SnackBar(content: Text("Login Successful ✅")),
         );
         // Navigator.push(context, _createRoute(BottomNavBar()));
-        Navigator.pushReplacement(context, _createRoute(CustomBottomNavBar()));
+        Navigator.pushReplacement(context, createRoute(CustomBottomNavBar()));
       }
       on FirebaseAuthException catch (e) {
         String message = "";
@@ -113,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Google Sign-In Successful ✅")),
         );
-        Navigator.pushReplacement(context, _createRoute(CustomBottomNavBar()));
+        Navigator.pushReplacement(context, createRoute(CustomBottomNavBar()));
       }
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -312,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             GestureDetector(
                               onTap: () {
                                 // handle forgot password
-                                Navigator.push(context, _createRoute(ForgotPasswordScreen()));
+                                Navigator.push(context, createRoute(ForgotPasswordScreen()));
                               },
                               child: Text(
                                 "Forgot password?",
@@ -407,7 +408,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () {
                         // go to signup
-                        Navigator.push(context, _createRoute(Registrationscreen()));
+                        Navigator.push(context, createRoute(Registrationscreen()));
                       },
                       child: Text(
                         "Create one here",
@@ -424,26 +425,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
-
-
-// Custom Page Route with slide animation
-Route _createRoute(Widget page) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => page,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      // Slide from right
-      const begin = Offset(1.0, 0.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      var offsetAnimation = animation.drive(tween);
-
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
-    },
-  );
 }

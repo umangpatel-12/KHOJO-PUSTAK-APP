@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart'; // Added import
 
 import '../../main.dart';
+import '../BottomNavigationBar/BottomNavBar.dart';
 import '../Screens/HomeScreen.dart'; // Assuming this is where BottomAppBar might be or a similar screen
+import '../Screens/Widgets/ButtonLayout.dart';
 import 'LoginScreen.dart';
 
 class Registrationscreen extends StatefulWidget {
@@ -26,6 +28,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _agree = false;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -97,6 +100,13 @@ class _RegistrationscreenState extends State<Registrationscreen> {
 
   ////////////////////Firebase Authentication////////////////////
   Future<void> _registerUser() async {
+    if(_formKey.currentState!.validate())
+      {
+        setState(() {
+          _loading = true;
+        });
+      }
+
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _email.text.trim(),
@@ -135,7 +145,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
           const SnackBar(content: Text("Registration Successful ✅")),
         );
         // Ensure BottomAppBar() is a Page/Screen or replace with your actual home screen widget
-        Navigator.push(context, _createRoute(BottomAppBar())); 
+        Navigator.pushReplacement(context, createRoute(CustomBottomNavBar()));
       }
     } on FirebaseAuthException catch (e) {
       String message;
@@ -153,6 +163,11 @@ class _RegistrationscreenState extends State<Registrationscreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An unexpected error occurred: $e')),
       );
+    }
+    finally{
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -412,10 +427,19 @@ class _RegistrationscreenState extends State<Registrationscreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              textStyle:
-                              const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                              textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 16),
                             ),
-                            child: const Text('Create Account'),
+                            child: _loading
+                                ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : const Text('Create Account'),
                           ),
                         ),
 
@@ -473,7 +497,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
                             const Text('Already have an account? '),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pop(context, _createRoute(LoginScreen()));
+                                Navigator.pop(context, createRoute(LoginScreen()));
                               },
                               child: Text(
                                 'Sign in here',
@@ -496,23 +520,4 @@ class _RegistrationscreenState extends State<Registrationscreen> {
       ),
     );
   }
-}
-
-Route _createRoute(Widget page) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => page,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(1.0, 0.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      var offsetAnimation = animation.drive(tween);
-
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
-    },
-  );
 }

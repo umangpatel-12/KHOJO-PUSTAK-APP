@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -32,7 +36,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
     });
   }
 
-  String location = "Fetching location...";
+  String address = "Fetching location...";
 
   @override
   void initState() {
@@ -41,28 +45,67 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   }
 
   Future<void> _requestLocationPermissionAndGetLocation() async {
-    // Request permission
     var status = await Permission.location.request();
 
     if (status.isGranted) {
-      // Permission granted, get location
+      // Get user UID
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        setState(() {
+          this.address = "User not logged in!";
+        });
+        return;
+      }
+
+      // Get current position
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Convert lat/lon → readable address
+      List<Placemark> placemarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark place = placemarks[0];
+      String address =
+          "${place.name}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+
       setState(() {
-        location = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
+        this.address = address;
       });
+
+      // ✅ Save to Firestore under current user’s UID
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).collection("location").doc(user.uid).set({
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+          'address': address,
+          // 'timestamp': DateTime.now(),
+      }, SetOptions(merge: true)); // merge = overwrite nahi karega
+
+      // ✅ Save to Realtime Database under current user’s UID
+      DatabaseReference ref =
+      FirebaseDatabase.instance.ref("users/${user.uid}/location");
+      await ref.set({
+
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+          'address': address,
+          // 'timestamp': DateTime.now().toIso8601String(),
+      });
+
+      // print("📍 Location stored successfully for user: ${user.uid}");
     } else if (status.isDenied) {
       setState(() {
-        location = "Location permission denied";
+        this.address = "Location permission denied";
       });
     } else if (status.isPermanentlyDenied) {
-      // Open app settings
       setState(() {
-        location = "Permission permanently denied. Open settings to allow.";
+        this.address = "Permission permanently denied. Open settings to allow.";
       });
       openAppSettings();
     }
   }
+
 
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = _selectedIndex == index;

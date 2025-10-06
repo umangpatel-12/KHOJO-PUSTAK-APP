@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,9 +16,42 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _address = TextEditingController();
+
   static const Color primaryGreen = Color(0xFF05A941);
   bool _loading = false;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _showAddData();
+  }
+
+  Future<void> _showAddData() async{
+    final user = FirebaseAuth.instance.currentUser;
+    if(user != null) {
+      final addressDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("location")
+          .doc(user.uid)
+          .get();
+
+      if (addressDoc.exists) {
+        final addressData = addressDoc.data()!;
+        setState(() {
+          _address.text = addressData['address'] ?? '';
+        });
+      }
+      else
+        {
+          setState(() {
+            _address.text = '';
+          });
+        }
+    }
+  }
 
   InputDecoration _buildDecoration(String hint, IconData icon) {
     return InputDecoration(
@@ -108,7 +143,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                 SizedBox(height: 2,),
 
                                 Text(
-                                  "123, Andheri West, Mumbai, Maharashtra - 400053",
+                                  _address.text.isEmpty ? "Location" : _address.text,
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w400,
