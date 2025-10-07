@@ -30,7 +30,18 @@ class _LocationScreenState extends State<LocationScreen> {
 
   Future<void> _showAddData() async{
     final user = FirebaseAuth.instance.currentUser;
-    if(user != null) {
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        setState(() {
+          _address.text = data['address'] ?? '';
+        });
+      }
+
       final addressDoc = await FirebaseFirestore.instance
           .collection("users")
           .doc(user.uid)
@@ -39,17 +50,16 @@ class _LocationScreenState extends State<LocationScreen> {
           .get();
 
       if (addressDoc.exists) {
-        final addressData = addressDoc.data()!;
+        final addressData  = addressDoc.data()!;
         setState(() {
           _address.text = addressData['address'] ?? '';
         });
       }
-      else
-        {
-          setState(() {
-            _address.text = '';
-          });
-        }
+      else{
+        setState(() {
+          _address.text = '';
+        });
+      }
     }
   }
 
@@ -85,7 +95,7 @@ class _LocationScreenState extends State<LocationScreen> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        iconTheme: IconThemeData(color: Colors.green,),
+        iconTheme: IconThemeData(color: Colors.green,size: 20),
       ),
 
       body: Padding(

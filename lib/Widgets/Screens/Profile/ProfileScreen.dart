@@ -10,10 +10,12 @@ import 'package:khojpustak/Widgets/Authentication/LoginScreen.dart';
 import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
 import 'package:khojpustak/Widgets/Screens/Profile/EditProfileScreen.dart';
 import 'package:khojpustak/Widgets/Screens/Profile/LocationScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/WishlishListsScreen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../Widgets/ButtonLayout.dart';
 import '../Widgets/ProfileCard.dart';
+import 'ListingBooksScreen.dart';
 
 class Profilescreen extends StatefulWidget {
   const Profilescreen({super.key});
@@ -236,21 +238,22 @@ class _ProfilescreenState extends State<Profilescreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        ActivityTile(
-                          icon: Icons.shopping_bag_outlined,
-                          title: "My Orders",
-                          subtitle: "Track your purchases",
-                          count: 3,
-                          onTap: () {
-                            print("My Orders tapped");
-                          },
-                        ),
+                        // ActivityTile(
+                        //   icon: Icons.shopping_bag_outlined,
+                        //   title: "My Orders",
+                        //   subtitle: "Track your purchases",
+                        //   count: 3,
+                        //   onTap: () {
+                        //     print("My Orders tapped");
+                        //   },
+                        // ),
                         ActivityTile(
                           icon: Icons.inventory_2_outlined,
                           title: "My Listings",
                           subtitle: "Manage your book listings",
                           count: 8,
                           onTap: () {
+                            Navigator.push(context, createRoute(ListingBookScreen()));
                             print("My Listings tapped");
                           },
                         ),
@@ -260,6 +263,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                           subtitle: "Saved books",
                           count: 12,
                           onTap: () {
+                            Navigator.push(context, createRoute(WishlishListScreen()));
                             print("Wishlist tapped");
                           },
                         ),
