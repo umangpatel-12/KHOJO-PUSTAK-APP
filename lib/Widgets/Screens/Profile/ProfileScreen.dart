@@ -8,14 +8,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:khojpustak/Widgets/Authentication/LoginScreen.dart';
 import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/EditProfileScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/LocationScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/WishlishListsScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/Account/EditProfileScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/Account/LocationScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/MyActivity/WishlishListsScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/Support/ConditionsScreen.dart';
+import 'package:khojpustak/Widgets/Screens/Profile/Support/HelpScreen.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../Widgets/ButtonLayout.dart';
 import '../Widgets/ProfileCard.dart';
-import 'ListingBooksScreen.dart';
+import 'MyActivity/ListingBooksScreen.dart';
 
 class Profilescreen extends StatefulWidget {
   const Profilescreen({super.key});
@@ -347,6 +349,75 @@ class _ProfilescreenState extends State<Profilescreen> {
             ),
 
             const SizedBox(height: 16),
+
+            // Support
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  )
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 8),
+                    const Text(
+                      "     Support",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black45),
+                    ),
+                    ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        ActivityTile(
+                          icon: Icons.inventory_2_outlined,
+                          title: "Help & Support",
+                          subtitle: "Get help and support",
+                          count: 8,
+                          onTap: () {
+                            Navigator.push(context, createRoute(HelpScreen()));
+                            print("My Listings tapped");
+                          },
+                        ),
+                        ActivityTile(
+                          icon: Icons.favorite_border,
+                          title: "Terms & Conditions",
+                          subtitle: "Read our terms and conditions",
+                          count: 12,
+                          onTap: () {
+                            Navigator.push(context, createRoute(ConditionsScreen()));
+                            print("Wishlist tapped");
+                          },
+                        ),
+                        // ActivityTile(
+                        //   icon: Icons.history,
+                        //   title: "Transaction History",
+                        //   subtitle: "All your transactions",
+                        //   onTap: () {
+                        //     print("Transaction History tapped");
+                        //   },
+                        // ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height: 16,),
 
             // Logout
             Container(

@@ -35,7 +35,7 @@ class ActivityTile extends StatelessWidget {
             title: Text(
               title,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 fontSize: 16,
                 color: color,
               ),
