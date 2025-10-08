@@ -6,18 +6,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:khojpustak/Widgets/Authentication/LoginScreen.dart';
-import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/Account/EditProfileScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/Account/LocationScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/MyActivity/WishlishListsScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/Support/ConditionsScreen.dart';
-import 'package:khojpustak/Widgets/Screens/Profile/Support/HelpScreen.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../Widgets/ButtonLayout.dart';
-import '../Widgets/ProfileCard.dart';
+import '../../Widgets/CardLayouts/ButtonLayout.dart';
+import '../../Widgets/CardLayouts/ProfileCard.dart';
+import '../Authentication/LoginScreen.dart';
+import '../ForgotPassword/ForgotPasswordScreen.dart';
+import 'Account/EditProfileScreen.dart';
+import 'Account/LocationScreen.dart';
 import 'MyActivity/ListingBooksScreen.dart';
+import 'MyActivity/WishlishListsScreen.dart';
+import 'Support/ConditionsScreen.dart';
+import 'Support/HelpScreen.dart';
 
 class Profilescreen extends StatefulWidget {
   const Profilescreen({super.key});

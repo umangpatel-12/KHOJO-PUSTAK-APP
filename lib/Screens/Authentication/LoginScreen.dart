@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:khojpustak/Widgets/ForgotPassword/ForgotPasswordScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Widgets/CardLayouts/ButtonLayout.dart';
 import '../BottomNavigationBar/BottomNavBar.dart';
-import '../Screens/Widgets/ButtonLayout.dart';
+import '../ForgotPassword/ForgotPasswordScreen.dart';
 import 'RegistrationScreen.dart';
 
 class LoginScreen extends StatefulWidget {

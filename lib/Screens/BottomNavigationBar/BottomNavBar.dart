@@ -6,11 +6,12 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import '../Screens/CartScreen.dart';
-import '../Screens/HomeScreen.dart';
-import '../Screens/MyBooksScreen.dart';
-import '../Screens/Profile/ProfileScreen.dart';
-import '../Screens/SellScreen.dart';
+
+import '../CartScreen.dart';
+import '../HomeScreen.dart';
+import '../MyBooksScreen.dart';
+import '../Profile/ProfileScreen.dart';
+import '../SellScreen.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
   const CustomBottomNavBar({super.key});

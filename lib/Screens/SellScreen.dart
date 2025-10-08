@@ -429,7 +429,8 @@ class _SellScreenState extends State<SellScreen> {
 
 // Custom bullet point widget
 Widget bulletPoint(String text) {
-  return Padding(
+  return
+    Padding(
     padding: const EdgeInsets.symmetric(vertical: 4),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,

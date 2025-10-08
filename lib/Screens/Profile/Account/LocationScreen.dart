@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../Widgets/ProfileCard.dart';
-
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
 
@@ -118,7 +116,8 @@ class _LocationScreenState extends State<LocationScreen> {
                     child:
                     Padding(
                       padding: const EdgeInsets.all(22.0),
-                      child: Row(
+                      child:
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
@@ -265,45 +264,6 @@ class _LocationScreenState extends State<LocationScreen> {
               ],
             ),
           ),
-      // Container(
-      //   decoration: BoxDecoration(
-      //     color: Colors.white,
-      //     borderRadius: BorderRadius.circular(10),
-      //     boxShadow: [
-      //       BoxShadow(
-      //         color: Colors.black.withOpacity(0.06),
-      //         blurRadius: 18,
-      //         offset: const Offset(0, 8),
-      //       )
-      //     ],
-      //   ),
-      //   child: Row(
-      //     children: [
-      //       CircleAvatar(
-      //         radius: 35,
-      //         backgroundColor: Colors.green.shade50,
-      //         child: Icon(
-      //           Icons.location_on_outlined,
-      //           color: Colors.green,
-      //           size: 40,
-      //         ),
-      //       ),
-      //
-      //       Column(
-      //         children: [
-      //           Text(
-      //             "Location",
-      //             style: TextStyle(
-      //               fontSize: 18,
-      //               fontWeight: FontWeight.w500,
-      //               color: Colors.black45
-      //             ),
-      //           ),
-      //         ],
-      //       )
-      //     ],
-      //   ),
-      // ),,
 
     );
   }

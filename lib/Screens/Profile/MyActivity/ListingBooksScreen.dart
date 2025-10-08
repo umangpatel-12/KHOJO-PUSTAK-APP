@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:khojpustak/Widgets/Screens/Widgets/ListingCardLayout.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../../Widgets/CardLayouts/ListingCardLayout.dart';
 
 class ListingBookScreen extends StatefulWidget {
   const ListingBookScreen({super.key});

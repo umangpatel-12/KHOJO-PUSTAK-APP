@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../Controller/banner_controller.dart';
 import 'BookDetailsScreen.dart';
 import 'CategoryScreen.dart';
-import 'Widgets/InfoCard.dart';
+import '../Widgets/CardLayouts/InfoCard.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
