@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../Controller/banner_controller.dart';
+import '../Widgets/CardLayouts/ButtonLayout.dart';
+import '../Widgets/Models/CategoryModel.dart';
 import 'BookDetailsScreen.dart';
+import 'BooksListScreen.dart';
 import 'CategoryScreen.dart';
 import '../Widgets/CardLayouts/InfoCard.dart';
+import 'SubCategoryScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,6 +51,19 @@ class _HomeScreenState extends State<HomeScreen> {
       "textColor": Colors.orange,
     },
   ];
+
+  final List<Color> categoryColors = [
+    Color(0xFF2E3B55), // Deep Navy
+    Color(0xFF3E2723), // Dark Brown
+    Color(0xFF4A148C), // Dark Purple
+    Color(0xFF0B3D91), // Dark Royal Blue
+    Color(0xFF880E4F), // Deep Magenta
+    Color(0xFF004D40), // Dark Teal
+    Color(0xFF1A237E), // Indigo
+    Color(0xFF263238), // Charcoal / Blue Gray
+  ];
+
+
 
   @override
   void initState() {
@@ -241,59 +259,108 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
       
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: categories.length,
-                      padding: const EdgeInsets.only(top: 5),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1.6,
-                      ),
-                      itemBuilder: (context, index) {
-                        final category = categories[index];
-                        return InkWell(
-                          highlightColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {},
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: category["color"],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    category["title"],
-                                    style: TextStyle(
-                                      color: category["textColor"],
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  category["books"],
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
+                    FutureBuilder(
+                      future: FirebaseFirestore.instance.collection('Category').get(),
+                      builder: (context, snapshot) {
+                        // Error state
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: Text('Something went wrong 😕'),
+                          );
+                        }
+                        // Loading state
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        // Empty state
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Text('No categories found 😢'),
+                          );
+                        }
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: categories.last.length,
+                          padding: const EdgeInsets.only(top: 5),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 1.6,
                           ),
+                          itemBuilder: (context, index) {
+
+                            final doc = snapshot.data!.docs[index];
+                            final color = categoryColors[index % categoryColors.length];
+
+                            CategoryModel categoryModel = CategoryModel(
+                              cname: doc['cname'],
+                            );
+
+                            final categoryId = doc.id; // 🔹 category document id
+
+
+                            return InkWell(
+                              highlightColor: Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () async {
+                                // 🔹 Check if subcategories exist in this category
+                                final subcategorySnapshot = await FirebaseFirestore.instance
+                                    .collection('Category')
+                                    .doc(categoryId)
+                                    .collection('Subcategory')
+                                    .get();
+
+                                if (subcategorySnapshot.docs.isNotEmpty) {
+                                  // ✅ Subcategories exist → go to SubCategoryScreen
+                                  Navigator.push(context, createRoute(SubCategoryScreen(categoryId: categoryId, categoryName: categoryModel.cname)));
+                                } else {
+                                  // ❌ No subcategories → go to BooksListScreen
+                                  Navigator.push(context, createRoute(Bookslistscreen(categoryName: categoryModel.cname)));
+                                }
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: color.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        categoryModel.cname,
+                                        style: TextStyle(
+                                          color: color.withOpacity(0.8),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "books",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         );
-                      },
+                      }
                     ),
                   ],
                 ),
