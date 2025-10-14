@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart'; // 👈 Add shimmer package
 import '../../Controller/banner_controller.dart';
 import '../Widgets/CardLayouts/ButtonLayout.dart';
 import '../Widgets/Models/CategoryModel.dart';
@@ -18,63 +18,42 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final bool isLoggedIn; 
-  final BannerController _bannerController = BannerController(); // Initialize here
+  late final bool isLoggedIn;
+  final BannerController _bannerController = BannerController();
+  final ScrollController _scrollController = ScrollController(); // 👈 for smooth scroll
 
   bool isWishlisted = false;
+  bool _isLoading = true;
   Color myGreenColor = const Color(0xFF06923E);
   late final Color lightGreen = Color.lerp(myGreenColor, Colors.white, 0.4)!;
 
-  final List<Map<String, dynamic>> categories = [
-    {
-      "title": "Engineering",
-      "books": "500+ books",
-      "color": Colors.blue.shade100,
-      "textColor": Colors.blue,
-    },
-    {
-      "title": "Medical",
-      "books": "300+ books",
-      "color": Colors.red.shade100,
-      "textColor": Colors.red,
-    },
-    {
-      "title": "MBA/Management",
-      "books": "250+ books",
-      "color": Colors.purple.shade100,
-      "textColor": Colors.purple,
-    },
-    {
-      "title": "Competitive Exams",
-      "books": "400+ books",
-      "color": Colors.orange.shade100,
-      "textColor": Colors.orange,
-    },
-  ];
-
   final List<Color> categoryColors = [
-    Color(0xFF2E3B55), // Deep Navy
-    Color(0xFF3E2723), // Dark Brown
-    Color(0xFF4A148C), // Dark Purple
-    Color(0xFF0B3D91), // Dark Royal Blue
-    Color(0xFF880E4F), // Deep Magenta
-    Color(0xFF004D40), // Dark Teal
-    Color(0xFF1A237E), // Indigo
-    Color(0xFF263238), // Charcoal / Blue Gray
+    Color(0xFF2E3B55),
+    Color(0xFF3E2723),
+    Color(0xFF4A148C),
+    Color(0xFF0B3D91),
+    Color(0xFF880E4F),
+    Color(0xFF004D40),
+    Color(0xFF1A237E),
+    Color(0xFF263238),
   ];
-
-
 
   @override
   void initState() {
     super.initState();
-    isLoggedIn = false; // Example: Default to false if not logged in.
-    _bannerController.init(); // Call init on the already created controller
+    isLoggedIn = false;
+    _bannerController.init();
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   @override
   void dispose() {
     _bannerController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -83,12 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
+          controller: _scrollController, // 👈 smooth scroll controller
+          // physics: const BouncingScrollPhysics(), // 👈 smooth scroll feel
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ===== Top Container: Logo + SignIn/Register =====
-      
-              // ===== Search Bar =====
+              // 🔹 Search Bar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 color: Colors.white,
@@ -108,36 +87,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-      
-              // ===== Banner / Container =====
+
+              // 🔹 Banner Section with shimmer
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: AnimatedBuilder(
                   animation: _bannerController,
                   builder: (context, child) {
-                    // Handle loading state first
                     if (_bannerController.isLoading) {
-                      return Container( // Maintain consistent height and styling
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200], // Placeholder color for loading
-                          borderRadius: BorderRadius.circular(12.0),
+                      // 🔥 Shimmer Placeholder
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
                         ),
-                        child: const Center(child: CircularProgressIndicator()),
                       );
                     }
-                    // After loading, check if there are images
+
                     if (_bannerController.bannerImageUrls.isEmpty) {
                       return Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          color: lightGreen, // Your original placeholder color
+                          color: lightGreen,
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        child: const Center(child: Text("No banner images available")),
+                        child:
+                        const Center(child: Text("No banner images available")),
                       );
                     }
-                    // If not loading and images are present, show the PageView
+
                     return SizedBox(
                       height: 200,
                       child: Stack(
@@ -153,65 +136,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Image.network(
                                   _bannerController.bannerImageUrls[index],
                                   fit: BoxFit.cover,
-                                  loadingBuilder: (BuildContext context, Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (BuildContext context, Object exception,
-                                      StackTrace? stackTrace) {
-                                    // Print the exception to the console for more details if needed
-                                    print("Image loading error in UI for URL: ${_bannerController.bannerImageUrls[index]}");
-                                    print("Image loading exception: $exception");
-                                    print("Image loading stackTrace: $stackTrace");
-
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(12.0),
-                                        border: Border.all(color: Colors.red.shade200),
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Error loading image:\n${exception.toString()}',
-                                            style: TextStyle(color: Colors.red.shade700, fontSize: 12),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
                                 ),
                               );
                             },
                           ),
-                          // Page Indicators
                           Positioned(
                             bottom: 10.0,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(_bannerController.bannerImageUrls.length, (index) {
-                                return Container(
-                                  width: 8.0,
-                                  height: 8.0,
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _bannerController.currentPage == index
-                                        ? myGreenColor
-                                        : Colors.grey[400],
-                                  ),
-                                );
-                              }),
+                              children: List.generate(
+                                  _bannerController.bannerImageUrls.length,
+                                      (index) {
+                                    return Container(
+                                      width: 8.0,
+                                      height: 8.0,
+                                      margin:
+                                      const EdgeInsets.symmetric(horizontal: 4.0),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: _bannerController.currentPage == index
+                                            ? myGreenColor
+                                            : Colors.grey[400],
+                                      ),
+                                    );
+                                  }),
                             ),
                           ),
                         ],
@@ -220,10 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-      
-              // =============== Category Section ============= //
+
+              // 🔹 Category Section
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -240,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Spacer(),
                         TextButton.icon(
                           onPressed: () {
-                            Navigator.push(context, _createRoute(CategoryScreen()));
+                            Navigator.push(
+                                context, _createRoute(const CategoryScreen()));
                           },
                           label: const Text(
                             "Filter",
@@ -250,126 +200,143 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          icon: const Icon(
-                            Icons.filter_alt_outlined,
-                            color: Colors.black54,
-                            size: 18,
-                          ),
+                          icon: const Icon(Icons.filter_alt_outlined,
+                              color: Colors.black54, size: 18),
                         ),
                       ],
                     ),
-      
+
+                    // 🔥 Shimmer for Category Loading
                     FutureBuilder(
-                      future: FirebaseFirestore.instance.collection('Category').get(),
-                      builder: (context, snapshot) {
-                        // Error state
-                        if (snapshot.hasError) {
-                          return const Center(
-                            child: Text('Something went wrong 😕'),
-                          );
-                        }
-                        // Loading state
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        // Empty state
-                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return const Center(
-                            child: Text('No categories found 😢'),
-                          );
-                        }
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: categories.length,
-                          padding: const EdgeInsets.only(top: 5),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 1.6,
-                          ),
-                          itemBuilder: (context, index) {
-
-                            final doc = snapshot.data!.docs[index];
-                            final color = categoryColors[index % categoryColors.length];
-
-                            CategoryModel categoryModel = CategoryModel(
-                              cname: doc['cname'],
-                            );
-
-                            final categoryId = doc.id; // 🔹 category document id
-
-
-                            return InkWell(
-                              highlightColor: Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              onTap: () async {
-                                // 🔹 Check if subcategories exist in this category
-                                final subcategorySnapshot = await FirebaseFirestore.instance
-                                    .collection('Category')
-                                    .doc(categoryId)
-                                    .collection('Subcategory')
-                                    .get();
-
-                                if (subcategorySnapshot.docs.isNotEmpty) {
-                                  // ✅ Subcategories exist → go to SubCategoryScreen
-                                  Navigator.push(context, createRoute(SubCategoryScreen(categoryId: categoryId, categoryName: categoryModel.cname)));
-                                } else {
-                                  // ❌ No subcategories → go to BooksListScreen
-                                  Navigator.push(context, createRoute(Bookslistscreen(categoryName: categoryModel.cname)));
-                                }
+                        future:
+                        FirebaseFirestore.instance.collection('Category').get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: 4,
+                              gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 1.6,
+                              ),
+                              itemBuilder: (context, index) {
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.grey.shade300,
+                                  highlightColor: Colors.grey.shade100,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: color.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey.shade300),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: color.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        categoryModel.cname,
-                                        style: TextStyle(
-                                          color: color.withOpacity(0.8),
-                                          fontWeight: FontWeight.bold,
+                            );
+                          }
+
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
+                            return const Center(
+                                child: Text("No categories found 😢"));
+                          }
+
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: 4,
+                            gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 1.6,
+                            ),
+                            itemBuilder: (context, index) {
+                              final doc = snapshot.data!.docs[index];
+                              final color =
+                              categoryColors[index % categoryColors.length];
+                              final categoryId = doc.id;
+
+                              CategoryModel categoryModel =
+                              CategoryModel(cname: doc['cname']);
+
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () async {
+                                  final subcategorySnapshot =
+                                  await FirebaseFirestore.instance
+                                      .collection('Category')
+                                      .doc(categoryId)
+                                      .collection('Subcategory')
+                                      .get();
+
+                                  if (subcategorySnapshot.docs.isNotEmpty) {
+                                    Navigator.push(
+                                        context,
+                                        createRoute(SubCategoryScreen(
+                                            categoryId: categoryId,
+                                            categoryName: categoryModel.cname)));
+                                  } else {
+                                    Navigator.push(
+                                        context,
+                                        createRoute(Bookslistscreen(
+                                            categoryName: categoryModel.cname)));
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: color.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Colors.grey.shade300),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: color.withOpacity(0.15),
+                                          borderRadius:
+                                          BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          categoryModel.cname,
+                                          style: TextStyle(
+                                            color: color.withOpacity(0.8),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "books",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
+                                      const SizedBox(height: 8),
+                                      const Text(
+                                        "books",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    ),
+                              );
+                            },
+                          );
+                        }),
                   ],
                 ),
               ),
-      
-      
-              // =============== Featured Books ============= //
+
+              // 🔹 Featured Books Section
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
                     const Text(
@@ -382,7 +349,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const Spacer(),
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            _createRoute(Bookslistscreen(
+                                categoryName: "categoryName")));
+                      },
                       label: const Text(
                         "View All",
                         style: TextStyle(
@@ -391,29 +363,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      icon: const Icon(
-                        Icons.trending_up,
-                        color: Colors.black54,
-                        size: 18,
-                      ),
+                      icon: const Icon(Icons.trending_up,
+                          color: Colors.black54, size: 18),
                     ),
                   ],
                 ),
               ),
 
-              //Book Cards
+              // 🔹 Static Featured Card
               Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 4,
-                margin: const EdgeInsets.only(left: 12,right: 12,bottom: 12),
+                margin:
+                const EdgeInsets.only(left: 12, right: 12, bottom: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Stack(
                       children: [
                         GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, _createRoute(BookDetailsScreen()));
+                          onTap: () {
+                            Navigator.push(
+                                context, _createRoute(BookDetailsScreen()));
                           },
                           child: ClipRRect(
                             borderRadius: const BorderRadius.only(
@@ -421,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               topRight: Radius.circular(12),
                             ),
                             child: Image.network(
-                              "https://images.unsplash.com/photo-1553729784-e91953dec042", // Placeholder, replace with actual book image
+                              "https://images.unsplash.com/photo-1553729784-e91953dec042",
                               height: 160,
                               width: double.infinity,
                               fit: BoxFit.cover,
@@ -440,7 +412,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: const Text(
                               "Bestseller",
-                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              style:
+                              TextStyle(color: Colors.white, fontSize: 12),
                             ),
                           ),
                         ),
@@ -460,16 +433,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 6),
                           const Text(
-                            "Ramauan", // Placeholder book title
+                            "Ramauan",
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          const Text("by Rakesh", // Placeholder author
+                          const Text("by Rakesh",
                               style: TextStyle(color: Colors.grey)),
                           const SizedBox(height: 6),
                           Row(
                             children: const [
-                              Icon(Icons.star, color: Colors.orange, size: 18),
+                              Icon(Icons.star,
+                                  color: Colors.orange, size: 18),
                               SizedBox(width: 4),
                               Text("4.3"),
                               Text(" (20 reviews)",
@@ -481,13 +455,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               const Text("₹399",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.green)),
                               const SizedBox(width: 6),
                               const Text(
                                 "₹599",
                                 style: TextStyle(
                                     color: Colors.grey,
-                                    decoration: TextDecoration.lineThrough),
+                                    decoration:
+                                    TextDecoration.lineThrough),
                               ),
                               const Spacer(),
                               ElevatedButton.icon(
@@ -498,13 +475,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                icon: const Icon(
-                                    Icons.add_shopping_cart,
-                                    color: Colors.white,
-                                    size: 18),
+                                icon: const Icon(Icons.add_shopping_cart,
+                                    color: Colors.white, size: 18),
                                 label: const Text(
-                                    "Add",
-                                    style: TextStyle(color: Colors.white),
+                                  "Add",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
                             ],
@@ -516,9 +491,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // =============== Availability Info ============= //
+              // 🔹 Availability Info
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 color: Colors.green[50],
                 child: Column(
                   children: [
@@ -533,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(width: 10),
                         Expanded(
                           child: InfoCard(
-                            title: '50,000+', // Example data
+                            title: '50,000+',
                             subtitle: 'Happy Customers',
                           ),
                         ),
@@ -544,14 +520,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: const [
                         Expanded(
                           child: InfoCard(
-                            title: '24/7',  // Example data
+                            title: '24/7',
                             subtitle: 'Customer Support',
                           ),
                         ),
                         SizedBox(width: 10),
                         Expanded(
                           child: InfoCard(
-                            title: 'Free', // Example data
+                            title: 'Free',
                             subtitle: 'Delivery Available',
                           ),
                         ),
@@ -561,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              SizedBox(height: 70,)
+              const SizedBox(height: 70),
             ],
           ),
         ),
@@ -570,22 +546,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Custom Page Route with slide animation
+// 🔹 Page Route Animation
 Route _createRoute(Widget page) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => page,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    transitionsBuilder:
+        (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
       const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var tween = Tween(begin: begin, end: end)
+          .chain(CurveTween(curve: curve));
       var offsetAnimation = animation.drive(tween);
-
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
+      return SlideTransition(position: offsetAnimation, child: child);
     },
   );
 }
