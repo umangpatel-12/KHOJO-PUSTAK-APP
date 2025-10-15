@@ -1,16 +1,16 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-class Bookslistscreen extends StatefulWidget {
-  const Bookslistscreen({super.key, required this.categoryName});
-
-  final String categoryName;
+class ExploreScreen extends StatefulWidget {
+  const ExploreScreen({super.key});
 
   @override
-  State<Bookslistscreen> createState() => _BookslistscreenState();
+  State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _BookslistscreenState extends State<Bookslistscreen> {
+class _ExploreScreenState extends State<ExploreScreen> {
   bool _isLoading = true;
 
   @override
@@ -22,29 +22,16 @@ class _BookslistscreenState extends State<Bookslistscreen> {
       });
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        shadowColor: Colors.white,
-        elevation: 0.2,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.green, size: 22),
-        title: const Text(
-          "Featured Books",
-          style: TextStyle(
-            fontSize: 18,
-            color: Colors.green,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
+      extendBodyBehindAppBar: true, // so blur can extend behind AppBar
+
+      appBar: _appBar(),
       body: SafeArea(
         child: GridView.builder(
           physics: const BouncingScrollPhysics(), // smooth scroll ✅
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           itemCount: 10,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -65,7 +52,7 @@ class _BookslistscreenState extends State<Bookslistscreen> {
                 ),
               );
             }
-        
+
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -161,4 +148,83 @@ class _BookslistscreenState extends State<Bookslistscreen> {
       ),
     );
   }
+
+  PreferredSizeWidget _appBar() {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(120),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 15), // blur intensity
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0),
+            color: Colors.white.withOpacity(0.5), // transparent with blur effect
+            child: SafeArea(
+              child: Column(
+                children: [
+                  _toptitle(),
+                  _bottomtitle(),
+                  const SizedBox(height: 8),
+                  _searchbar(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+  Widget _toptitle() {
+    return Row(
+      children: [
+        Text(
+          "Explore Books",
+          style: TextStyle(
+            color: Colors.grey.shade800,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 5,)
+      ],
+    );
+  }
+
+  Widget _bottomtitle() {
+    return Row(
+      children: [
+        Text(
+          "Find your next great read",
+          style: TextStyle(
+            color: Colors.grey.shade500,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _searchbar() {
+    final TextEditingController _searchController = TextEditingController();
+    return Container(
+      height: 40,
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Search by title and author...',
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.2),
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            // borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
 }

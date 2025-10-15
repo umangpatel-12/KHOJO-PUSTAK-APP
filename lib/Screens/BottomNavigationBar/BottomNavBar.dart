@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:khojpustak/Screens/Profile/MyActivity/WishlishListsScreen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../CartScreen.dart';
+import '../ExploreScreen.dart';
 import '../HomeScreen.dart';
 import '../MyBooksScreen.dart';
 import '../Profile/ProfileScreen.dart';
@@ -27,7 +29,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
     HomeScreen(),
     MyBooksScreen(),
     SellScreen(),
-    CartScreen(),
+    ExploreScreen(),
     Profilescreen(),
   ];
 
@@ -192,7 +194,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                 children: [
                   buildNavItem(PhosphorIcons.house(), "Home", 0),
                   buildNavItem(PhosphorIcons.book(), "Books", 1),
-                  buildNavItem(PhosphorIcons.shoppingCartSimple(), "Cart", 3),
+                  buildNavItem(CupertinoIcons.search, "Explore", 3),
                   buildNavItem(PhosphorIcons.plus(), "Add", 2),
                   buildNavItem(PhosphorIcons.user(), "Profile", 4),
                 ],
