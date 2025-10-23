@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               final categoryId = doc.id;
 
                               CategoryModel categoryModel =
-                              CategoryModel(cname: doc['cname']);
+                              CategoryModel(cname: doc['cname'], Subcategory: []);
 
                               return InkWell(
                                 borderRadius: BorderRadius.circular(12),

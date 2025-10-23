@@ -234,10 +234,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         backgroundColor: Colors.green.shade50,
                         backgroundImage: _image != null
                             ? FileImage(_image!)
-                            : (profilePic != null
+                            : (
+                            profilePic != null
                             ? NetworkImage(profilePic!) as ImageProvider
                             : const AssetImage(
-                            "assets/images/user_pic.png")),
+                            "assets/images/user_pic.png")
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),

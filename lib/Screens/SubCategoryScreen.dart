@@ -201,14 +201,14 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                 final color = categoryColors[index % categoryColors.length];
 
                 SubcategoryModel subcategoryModel = SubcategoryModel(
-                    subcname: doc['subcname']
+                    cname: doc['cname']
                 );
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
                     // You can navigate to BooksListScreen for this subcategory
-                    Navigator.push(context, createRoute(Bookslistscreen(categoryName: subcategoryModel.subcname)));
+                    Navigator.push(context, createRoute(Bookslistscreen(categoryName: subcategoryModel.cname)));
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -226,7 +226,7 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            subcategoryModel.subcname,
+                            subcategoryModel.cname,
                             style: TextStyle(
                               color: color, // darker shade for text
                               fontWeight: FontWeight.bold,

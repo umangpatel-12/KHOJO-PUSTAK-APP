@@ -49,9 +49,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     // 🔸 Loading shimmer for category chips
                     return ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      itemCount: 6,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       itemBuilder: (context, index) => Container(
                         margin: const EdgeInsets.only(right: 10),
                         width: 80,
@@ -67,10 +65,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   final docs = snapshot.data!.docs;
                   // 🔹 Add "All Books" at the start of the list
                   final allCategories = [
-                    CategoryModel(cname: 'All Books'),
-                    ...docs.map((doc) => CategoryModel(cname: doc['cname']))
+                    CategoryModel(cname: 'All Books', Subcategory: []),
+                    ...docs.map((doc) => CategoryModel(cname: doc['cname'], Subcategory: []))
                   ];
-
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding:
@@ -90,8 +87,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           duration: const Duration(milliseconds: 250),
                           curve: Curves.easeInOut,
                           margin: const EdgeInsets.only(right: 10),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: isSelected ? Colors.green : Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -115,7 +111,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             child: Text(
                               category.cname,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: isSelected ? Colors.white : Colors.black,
                               ),

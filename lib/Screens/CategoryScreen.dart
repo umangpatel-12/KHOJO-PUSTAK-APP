@@ -81,7 +81,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 final color = categoryColors[index % categoryColors.length];
 
                 CategoryModel categoryModel = CategoryModel(
-                  cname: doc['cname'],
+                  cname: doc['cname'], Subcategory: [],
                 );
 
                 final categoryId = doc.id; // 🔹 category document id

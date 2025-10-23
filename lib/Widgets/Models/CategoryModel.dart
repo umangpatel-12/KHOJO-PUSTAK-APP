@@ -1,18 +1,6 @@
-class CategoryModel{
+class CategoryModel {
   final String cname;
-  final String? subcategory;
-  final String? imageUrl;
+  final List<String> Subcategory;
 
-  CategoryModel({
-    required this.cname,
-    this.subcategory,
-    this.imageUrl,
-  });
-  Map<String, dynamic> toMap() {
-    return {
-      'cname': cname,
-      'subcategory': subcategory,
-      'imageUrl': imageUrl,
-    };
-  }
+  CategoryModel({required this.cname, required this.Subcategory});
 }
