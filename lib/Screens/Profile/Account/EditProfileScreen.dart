@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() {
           _fullName.text = data['fullName'] ?? '';
           _email.text = data['email'] ?? user.email ?? '';
-          _phone.text = data['phone'] ?? '';
+          _phone.text = data['phone'] *0?? '';
           _dob.text = data['dob'] ?? '';
           _address.text = data['location'] ?? '';
           profilePic = data['profilePic'];
@@ -229,14 +230,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     GestureDetector(
                       onTap: _pickImage,
-                      child: CircleAvatar(
+                      child:
+                      CircleAvatar(
                         radius: 55,
                         backgroundColor: Colors.green.shade50,
                         backgroundImage: _image != null
                             ? FileImage(_image!)
                             : (
                             profilePic != null
-                            ? NetworkImage(profilePic!) as ImageProvider
+                            ? CachedNetworkImageProvider(profilePic!,) as ImageProvider
                             : const AssetImage(
                             "assets/images/user_pic.png")
                         ),

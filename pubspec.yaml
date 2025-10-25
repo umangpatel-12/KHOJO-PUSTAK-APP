@@ -62,6 +62,7 @@ dependencies:
   #  Image
   image_picker: ^1.2.0
   path: ^1.9.1
+  cached_network_image: ^3.4.1
   google_mlkit_object_detection: ^0.15.0
   google_mlkit_text_recognition: ^0.15.0
   tflite_flutter: ^0.11.0
