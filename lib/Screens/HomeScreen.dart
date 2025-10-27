@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:khojpustak/Widgets/Models/BookModel.dart';
 import 'package:shimmer/shimmer.dart'; // 👈 Add shimmer package
 import '../../Controller/banner_controller.dart';
 import '../Widgets/CardLayouts/ButtonLayout.dart';
@@ -208,8 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // 🔥 Shimmer for Category Loading
                     FutureBuilder(
-                        future:
-                        FirebaseFirestore.instance.collection('Category').get(),
+                        future: FirebaseFirestore.instance.collection('Category').get(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -284,8 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   } else {
                                     Navigator.push(
                                         context,
-                                        createRoute(Bookslistscreen(
-                                            categoryName: categoryModel.cname)));
+                                        createRoute(Bookslistscreen(categoryName: '',)));
                                   }
                                 },
                                 child: Container(
@@ -352,8 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         Navigator.push(
                             context,
-                            _createRoute(Bookslistscreen(
-                                categoryName: "categoryName")));
+                            _createRoute(Bookslistscreen(categoryName: '',)));
                       },
                       label: const Text(
                         "View All",
@@ -371,124 +369,223 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               // 🔹 Static Featured Card
-              Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                elevation: 4,
-                margin:
-                const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context, _createRoute(BookDetailsScreen()));
-                          },
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              topRight: Radius.circular(12),
+
+// Inside your widget:
+              FutureBuilder(
+                future: FirebaseFirestore.instance.collection('Books').get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // ✅ Shimmer effect while loading
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 6, // number of shimmer cards
+                      itemBuilder: (context, index) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey.shade300,
+                          highlightColor: Colors.grey.shade100,
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Image.network(
-                              "https://images.unsplash.com/photo-1553729784-e91953dec042",
-                              height: 160,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 8,
-                          left: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text(
-                              "Bestseller",
-                              style:
-                              TextStyle(color: Colors.white, fontSize: 12),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Chip(
-                            label: Text("Academic"),
-                            backgroundColor: Color(0xffe8f0fe),
-                            labelStyle: TextStyle(fontSize: 12),
-                            padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            "Ramauan",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const Text("by Rakesh",
-                              style: TextStyle(color: Colors.grey)),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: const [
-                              Icon(Icons.star,
-                                  color: Colors.orange, size: 18),
-                              SizedBox(width: 4),
-                              Text("4.3"),
-                              Text(" (20 reviews)",
-                                  style: TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              const Text("₹399",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.green)),
-                              const SizedBox(width: 6),
-                              const Text(
-                                "₹599",
-                                style: TextStyle(
-                                    color: Colors.grey,
-                                    decoration:
-                                    TextDecoration.lineThrough),
-                              ),
-                              const Spacer(),
-                              ElevatedButton.icon(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                            elevation: 4,
+                            margin:
+                            const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Shimmer image placeholder
+                                Container(
+                                  height: 160,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(12),
+                                      topRight: Radius.circular(12),
+                                    ),
                                   ),
                                 ),
-                                icon: const Icon(Icons.add_shopping_cart,
-                                    color: Colors.white, size: 18),
-                                label: const Text(
-                                  "Add",
-                                  style: TextStyle(color: Colors.white),
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 80,
+                                        height: 16,
+                                        color: Colors.grey[300],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        width: 150,
+                                        height: 16,
+                                        color: Colors.grey[300],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        width: 100,
+                                        height: 14,
+                                        color: Colors.grey[300],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        width: 60,
+                                        height: 16,
+                                        color: Colors.grey[300],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                        );
+                      },
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text("No books found 😢"));
+                  }
+
+                  // ✅ Real data after loading
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final doc = snapshot.data!.docs[index];
+                      final data = doc.data() as Map<String, dynamic>;
+
+                      BookModel bookmodel = BookModel(
+                        title: data['title'] ?? '',
+                        category: data['category'] ?? '',
+                        images: List<String>.from(data['images'] ?? []),
+                        description: data['description'] ?? '',
+                        condition: data['condition'] ?? 'Good',
+                        location: data['location'] ?? '',
+                        phone: data['phone'] ?? '',
+                        price: double.tryParse(data['price'].toString()) ?? 0.0,
+                        userId: data['userId'] ?? '',
+                        author: data['author'] ?? 'Unknown',
+                      );
+
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                        margin:
+                        const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(context, createRoute(BookDetailsScreen(book: bookmodel)));
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(12),
+                                      topRight: Radius.circular(12),
+                                    ),
+                                    child: Image.network(
+                                      bookmodel.images.isNotEmpty
+                                          ? bookmodel.images[0]
+                                          : 'https://via.placeholder.com/150',
+                                      height: 160,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  left: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Text(
+                                      "Bestseller",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Chip(
+                                    label: Text(bookmodel.category),
+                                    backgroundColor: const Color(0xffe8f0fe),
+                                    labelStyle: const TextStyle(fontSize: 12),
+                                    padding: EdgeInsets.zero,
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    bookmodel.title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "by ${bookmodel.author ?? 'Unknown Author'}",
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  const Row(
+                                    children: [
+                                      Icon(Icons.star,
+                                          color: Colors.orange, size: 18),
+                                      SizedBox(width: 4),
+                                      Text("4.3"),
+                                      Text(" (20 reviews)",
+                                          style: TextStyle(color: Colors.grey)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "₹${bookmodel.price}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Text(
+                                        "₹599",
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          decoration: TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
 
               // 🔹 Availability Info

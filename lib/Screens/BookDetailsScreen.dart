@@ -1,10 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:khojpustak/Widgets/Models/BookModel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class BookDetailsScreen extends StatefulWidget {
-  const BookDetailsScreen({super.key});
+  final BookModel book;
+
+  const BookDetailsScreen({super.key, required this.book});
 
   @override
   State<BookDetailsScreen> createState() => _BookDetailsScreenState();
@@ -12,12 +18,87 @@ class BookDetailsScreen extends StatefulWidget {
 
 class _BookDetailsScreenState extends State<BookDetailsScreen> {
   static const Color primaryGreen = Color(0xFF05A941);
+  bool isFavourite = false; // ✅ Move here (not inside build)
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavourite();
+  }
+
+  // ✅ Check if current book is already in favourites
+  Future<void> _checkIfFavourite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final favCollection = FirebaseFirestore.instance.collection('Favourite');
+    final existing = await favCollection
+        .where('userId', isEqualTo: user.uid)
+        .where('title', isEqualTo: widget.book.title)
+        .limit(1)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      setState(() {
+        isFavourite = true;
+      });
+    }
+  }
+
+  // ✅ Toggle favourite
+  Future<void> _favouritetoggle(BookModel book) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final favCollection = FirebaseFirestore.instance.collection('Favourite');
+    final existing = await favCollection
+        .where('userId', isEqualTo: user.uid)
+        .where('title', isEqualTo: book.title)
+        .limit(1)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      // 🔥 Already exists → remove it
+      await favCollection.doc(existing.docs.first.id).delete();
+      setState(() {
+        isFavourite = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Removed from favourite list')),
+      );
+    } else {
+      // ❤️ Not in favourites → add it
+      await favCollection.add({
+        'userId': user.uid,
+        'title': book.title,
+        'price': book.price,
+        'images': book.images,
+        'phone': book.phone,
+        'category': book.category,
+        'condition': book.condition,
+        'location': book.location,
+        'description': book.description,
+        'author': book.author,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      setState(() {
+        isFavourite = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Added to favourite list')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final book = widget.book;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Book Details",
           style: TextStyle(
             fontSize: 18,
@@ -31,305 +112,229 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         elevation: 1,
         actions: [
           IconButton(
-            icon: Icon(
-              FeatherIcons.share2,
-              size: 22,
-            ),
-            onPressed: () {  },
+            icon: const Icon(FeatherIcons.share2, size: 22),
+            onPressed: () {},
           ),
           IconButton(
-            onPressed: () {},
-            icon: Icon(PhosphorIconsBold.heart,size: 22,),
+            onPressed: () => _favouritetoggle(book),
+            icon: Icon(
+              isFavourite
+                  ? CupertinoIcons.heart_fill
+                  : PhosphorIconsBold.heart,
+              color: isFavourite ? Colors.red : Colors.black,
+              size: 22,
+            ),
           ),
         ],
       ),
 
-      body: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withOpacity(0.1),
-              spreadRadius: 5,
-              offset: Offset(0, 3),
-            )
-          ]
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () {},
-                child: ClipRRect(
-                  child: Image.network(
-                    "https://images.unsplash.com/photo-1553729784-e91953dec042",
-                    height: 250,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ✅ Book Image
+            ClipRRect(
+              child: Image.network(
+                book.images.isNotEmpty
+                    ? book.images[0]
+                    : "https://via.placeholder.com/300",
+                height: 300,
+                width: double.infinity,
+                fit: BoxFit.cover,
               ),
+            ),
 
-              SizedBox(height: 16,),
+            const SizedBox(height: 16),
 
-              Padding(
-                padding: EdgeInsets.only(left: 16,right: 16,top: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Book Title
-                    Text(
-                      "Book Title of ramayan and show Loard Ram History",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ✅ Title
+                  Text(
+                    book.title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ✅ Author
+                  Row(
+                    children: [
+                      const Text(
+                        "By ",
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Text(
+                        book.author ?? "Unknown",
+                        style: const TextStyle(
+                          color: Colors.black38,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ✅ Price
+                  Row(
+                    children: [
+                      Text(
+                        "₹${book.price}",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "₹599",
+                        style: TextStyle(
+                          color: Colors.black38,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ✅ Contact Seller Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Contact Seller: ${book.phone}'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        textStyle: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 16),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(FeatherIcons.messageCircle, color: Colors.white),
+                          SizedBox(width: 12),
+                          Text('Contact Seller'),
+                        ],
                       ),
                     ),
+                  ),
 
-                    SizedBox(height: 10,),
+                  const SizedBox(height: 16),
+                  const Divider(height: 8),
 
-                    // Book Auther
-                    Row(
+                  // ✅ Book Information
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                            "By",
+                        const Text(
+                          "Book Details",
                           style: TextStyle(
-                            color: Colors.black38,
-                            fontWeight: FontWeight.w400,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
+                        const SizedBox(height: 20),
 
-                        SizedBox(width: 5,),
-
-                        Text(
-                          "Author Name",
-                          style: TextStyle(
-                            color: Colors.black38,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-
-                    ),
-
-                    SizedBox(height: 12,),
-
-                    // Book Price
-                    Row(
-                      children: [
-                        Text(
-                          "₹399",
-                          style: TextStyle(
-                            fontSize: 22,
-                            color: Colors.green,
-                          ),
-                        ),
-                        SizedBox(width: 8,),
-
-                        Text(
-                          "₹599",
-                          style: TextStyle(
-                            color: Colors.black38,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                        SizedBox(width: 8,),
-                      ]
-                    ),
-
-                    SizedBox(height: 12,),
-
-                    // Contact Button
-                    SizedBox(
-                      width: double.infinity,
-                      child:
-                      // _loading ? CircularProgressIndicator() :
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryGreen,
-                          foregroundColor: Colors.white,
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          textStyle: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 16),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
-                            Icon(
-                              FeatherIcons.messageCircle,
-                              color: Colors.white,
+                            // Left column
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  buildDetailItem("Category", book.category),
+                                  buildDetailItem("Condition", book.condition),
+                                  buildDetailItem("Location", book.location),
+                                ],
+                              ),
                             ),
-
-                            SizedBox(width: 12,),
-
-                            const Text('Contact Seller'),
+                            // Right column
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  buildDetailItem("Seller ID", book.userId),
+                                  buildDetailItem("Phone", book.phone),
+                                  buildDetailItem("Price", "₹${book.price}"),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
+                  ),
 
-                    SizedBox( height: 16,),
-                    Divider(height: 8,),
-                    SizedBox(height: 5,),
+                  const Divider(height: 8),
 
-                    // Book Information
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Book Details",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
+                  // ✅ Description
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Description",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
                           ),
-                          const SizedBox(height: 20),
-
-                          // Main Row for 2 Columns
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Left Column
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    // label - value pair
-                                    // (Category)
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Category:", style: TextStyle(fontWeight: FontWeight.w500)),
-                                          SizedBox(height: 4),
-                                          Text("academic"),
-                                        ],
-                                      ),
-                                    ),
-                                    // Pages
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Pages:", style: TextStyle(fontWeight: FontWeight.w500)),
-                                          SizedBox(height: 4),
-                                          Text("856"),
-                                        ],
-                                      ),
-                                    ),
-                                    // Year
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Year:", style: TextStyle(fontWeight: FontWeight.w500)),
-                                          SizedBox(height: 4),
-                                          Text("2022"),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Right Column
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    // Language
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Language:", style: TextStyle(fontWeight: FontWeight.w500)),
-                                          SizedBox(height: 4),
-                                          Text("English"),
-                                        ],
-                                      ),
-                                    ),
-                                    // Publisher
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Publisher:", style: TextStyle(fontWeight: FontWeight.w500)),
-                                          SizedBox(height: 4),
-                                          Text("McGraw Hill Education"),
-                                        ],
-                                      ),
-                                    ),
-                                    // ISBN
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text("ISBN:", style: TextStyle(fontWeight: FontWeight.w500)),
-                                          SizedBox(height: 4),
-                                          Text("978-0071070405"),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          book.description.isNotEmpty
+                              ? book.description
+                              : "No description provided.",
+                          textAlign: TextAlign.justify,
+                        ),
+                      ],
                     ),
+                  ),
 
-                    SizedBox( height: 5,),
-                    Divider(height: 8,),
-                    SizedBox(height: 2,),
-
-                    // Description
-                    Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Description",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          SizedBox(height: 12,),
-
-                          Text(
-                            "Do you want me to also make a reusable function (like buildDetailItem) so you don’t have to repeat the same Padding + Column code for each label/value?",
-                            textAlign: TextAlign.justify,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(height: 5,)
-                  ],
-                ),
-              )
-            ]
-          ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  // ✅ Helper widget for Book Info
+  Widget buildDetailItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: const TextStyle(fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          Text(value.isNotEmpty ? value : "-"),
+        ],
       ),
     );
   }

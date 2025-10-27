@@ -188,7 +188,6 @@ class _ListingBookScreenState extends State<ListingBookScreen> {
                   itemCount: books.length,
                   itemBuilder: (BuildContext context, int index)
                   {
-                    // final book = books[index];
                     final book = books[index].data() as Map<String, dynamic>;
                     return GestureDetector(
                       onTap: (){
