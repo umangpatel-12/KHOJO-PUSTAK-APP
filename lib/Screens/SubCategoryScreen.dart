@@ -119,6 +119,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:khojpustak/Widgets/CardLayouts/ButtonLayout.dart';
 import 'package:khojpustak/Widgets/Models/SubCategory.dart';
+import 'BooksCategoryList.dart';
 import 'BooksListScreen.dart';
 
 class SubCategoryScreen extends StatefulWidget {
@@ -201,14 +202,14 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                 final color = categoryColors[index % categoryColors.length];
 
                 SubcategoryModel subcategoryModel = SubcategoryModel(
-                    cname: doc['cname']
+                    cname: doc['cname'], categoryId: doc['categoryId']
                 );
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
                     // You can navigate to BooksListScreen for this subcategory
-                    Navigator.push(context, createRoute(Bookslistscreen(categoryName: subcategoryModel.cname)));
+                    Navigator.push(context, createRoute(BooksCategoryList(categoryName: subcategoryModel.cname,categoryId: subcategoryModel.categoryId)));
                   },
                   child: Container(
                     decoration: BoxDecoration(

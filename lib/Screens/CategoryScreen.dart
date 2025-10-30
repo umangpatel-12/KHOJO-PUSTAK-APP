@@ -44,7 +44,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(14.0),
-        child: FutureBuilder<QuerySnapshot>(
+        child:
+        FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance.collection('Category').get(),
           builder: (context, snapshot) {
             // Error state
@@ -79,12 +80,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
               itemBuilder: (context, index) {
                 final doc = snapshot.data!.docs[index];
                 final color = categoryColors[index % categoryColors.length];
+                final String categoryId = doc['categoryId'];
+
+
 
                 CategoryModel categoryModel = CategoryModel(
-                  cname: doc['cname'], Subcategory: [],
+                  cname: doc['cname'], Subcategory: [], categoryId: categoryId,
                 );
 
-                final categoryId = doc.id; // 🔹 category document id
 
                 return InkWell(
                   highlightColor: Colors.transparent,

@@ -1,21 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:khojpustak/Screens/BookDetailsScreen.dart';
-import 'package:khojpustak/Widgets/CardLayouts/ButtonLayout.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../Widgets/CardLayouts/ButtonLayout.dart';
 import '../Widgets/Models/BookModel.dart';
+import 'BookDetailsScreen.dart';
 
-class Bookslistscreen extends StatefulWidget {
-  const Bookslistscreen({super.key, required this.categoryName});
-
+class BooksCategoryList extends StatefulWidget {
   final String categoryName;
+  final String categoryId;
+
+  const BooksCategoryList({super.key, required this.categoryName, required this.categoryId});
 
   @override
-  State<Bookslistscreen> createState() => _BookslistscreenState();
+  State<BooksCategoryList> createState() => _BooksCategoryListState();
 }
 
-class _BookslistscreenState extends State<Bookslistscreen> {
+class _BooksCategoryListState extends State<BooksCategoryList> {
   bool _isLoading = true;
 
   @override
@@ -27,19 +29,17 @@ class _BookslistscreenState extends State<Bookslistscreen> {
       });
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    return
-      Scaffold(
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
         elevation: 0.2,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.green, size: 22),
-        title: const Text(
-          "Featured Books",
+        title: Text(
+          widget.categoryName,
           style: TextStyle(
             fontSize: 18,
             color: Colors.green,
@@ -49,7 +49,9 @@ class _BookslistscreenState extends State<Bookslistscreen> {
       ),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('Books').snapshots(),
+          stream: FirebaseFirestore.instance.collection('Books')
+              .where('categoryId',isEqualTo: widget.categoryId)
+              .snapshots(),
           builder: (context, snapshot) {
             // 🟢 STEP 1: Show Shimmer while loading
             if (snapshot.connectionState == ConnectionState.waiting || _isLoading) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:khojpustak/Screens/BooksCategoryList.dart';
 import 'package:khojpustak/Widgets/Models/BookModel.dart';
 import 'package:shimmer/shimmer.dart'; // 👈 Add shimmer package
 import '../../Controller/banner_controller.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isWishlisted = false;
   bool _isLoading = true;
+  late final String categoryId;
   Color myGreenColor = const Color(0xFF06923E);
   late final Color lightGreen = Color.lerp(myGreenColor, Colors.white, 0.4)!;
 
@@ -209,7 +211,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // 🔥 Shimmer for Category Loading
                     FutureBuilder(
-                        future: FirebaseFirestore.instance.collection('Category').get(),
+                        future: FirebaseFirestore.instance
+                            .collection('Category')
+                            .get(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -245,7 +249,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Text("No categories found 😢"));
                           }
 
-                          return GridView.builder(
+                          return
+                            GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: 4,
@@ -258,18 +263,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             itemBuilder: (context, index) {
                               final doc = snapshot.data!.docs[index];
-                              final color =
-                              categoryColors[index % categoryColors.length];
-                              final categoryId = doc.id;
+                              final color = categoryColors[index % categoryColors.length];
+                              // final categoryId = doc.id;
+                              final String categoryId = doc['categoryId'];
 
                               CategoryModel categoryModel =
-                              CategoryModel(cname: doc['cname'], Subcategory: []);
+                              CategoryModel(cname: doc['cname'], Subcategory: [], categoryId: categoryId);
 
                               return InkWell(
                                 borderRadius: BorderRadius.circular(12),
                                 onTap: () async {
-                                  final subcategorySnapshot =
-                                  await FirebaseFirestore.instance
+                                  // ✅ Ab correct categoryId ke basis pe subcategory fetch karo
+                                  final subcategorySnapshot = await FirebaseFirestore.instance
                                       .collection('Category')
                                       .doc(categoryId)
                                       .collection('Subcategory')
@@ -284,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   } else {
                                     Navigator.push(
                                         context,
-                                        createRoute(Bookslistscreen(categoryName: '',)));
+                                        createRoute(BooksCategoryList(categoryName: categoryModel.cname, categoryId: categoryModel.categoryId,)));
                                   }
                                 },
                                 child: Container(

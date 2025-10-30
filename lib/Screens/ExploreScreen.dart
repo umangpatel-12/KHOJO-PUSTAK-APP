@@ -65,8 +65,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   final docs = snapshot.data!.docs;
                   // 🔹 Add "All Books" at the start of the list
                   final allCategories = [
-                    CategoryModel(cname: 'All Books', Subcategory: []),
-                    ...docs.map((doc) => CategoryModel(cname: doc['cname'], Subcategory: []))
+                    CategoryModel(cname: 'All Books', Subcategory: [], categoryId: ''),
+                    ...docs.map((doc) => CategoryModel(cname: doc['cname'], Subcategory: [], categoryId: doc['categoryId']))
                   ];
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,

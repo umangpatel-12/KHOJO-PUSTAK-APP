@@ -27,13 +27,46 @@ class Profilescreen extends StatefulWidget {
 
 class _ProfilescreenState extends State<Profilescreen> {
   String? profilePic;
+  int FavInt = 0;
+  int BooksInt = 0;
   final _fullName = TextEditingController();
   final _address = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser;
+
 
   @override
   void initState() {
     super.initState();
     _showdata(); // Load user data on screen open
+    _WishlistCount();
+    _GetBooksCount();
+  }
+
+  Future<void> _GetBooksCount() async{
+    if (user == null) return;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Books')
+        .where('userId',isEqualTo: user!.uid)
+        .get();
+
+    setState(() {
+      BooksInt = snapshot.docs.length;
+    });
+
+  }
+
+  Future<void> _WishlistCount() async{
+    if (user == null) return;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Favourite')
+        .where('userId',isEqualTo: user!.uid)
+        .get();
+
+    setState(() {
+      FavInt = snapshot.docs.length;
+    });
+
   }
 
   Future<void> _Logout() async {
@@ -239,20 +272,11 @@ class _ProfilescreenState extends State<Profilescreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        // ActivityTile(
-                        //   icon: Icons.shopping_bag_outlined,
-                        //   title: "My Orders",
-                        //   subtitle: "Track your purchases",
-                        //   count: 3,
-                        //   onTap: () {
-                        //     print("My Orders tapped");
-                        //   },
-                        // ),
                         ActivityTile(
                           icon: Icons.inventory_2_outlined,
                           title: "My Listings",
                           subtitle: "Manage your book listings",
-                          count: 8,
+                          count: BooksInt,
                           onTap: () {
                             Navigator.push(context, createRoute(ListingBookScreen()));
                             print("My Listings tapped");
@@ -262,7 +286,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                           icon: Icons.favorite_border,
                           title: "Wishlist",
                           subtitle: "Saved books",
-                          count: 12,
+                          count: FavInt,
                           onTap: () {
                             Navigator.push(context, createRoute(WishlishListScreen()));
                             print("Wishlist tapped");
@@ -385,7 +409,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                           icon: Icons.inventory_2_outlined,
                           title: "Help & Support",
                           subtitle: "Get help and support",
-                          count: 8,
                           onTap: () {
                             Navigator.push(context, createRoute(HelpScreen()));
                             print("My Listings tapped");
@@ -395,7 +418,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                           icon: Icons.favorite_border,
                           title: "Terms & Conditions",
                           subtitle: "Read our terms and conditions",
-                          count: 12,
                           onTap: () {
                             Navigator.push(context, createRoute(ConditionsScreen()));
                             print("Wishlist tapped");

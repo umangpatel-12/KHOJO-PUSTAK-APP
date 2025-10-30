@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:khojpustak/Widgets/Models/BookModel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   final BookModel book;
@@ -25,6 +25,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     super.initState();
     _checkIfFavourite();
   }
+
+  void _shareBookDetails(BookModel book) {
+    final String bookDetails = '''
+📚 *Name: ${book.title}*  
+✍️ Author: ${book.author}  
+🏷️ Category: ${book.category}  
+💰 Price: ₹${book.price.toStringAsFixed(2)}  
+📍 Location: ${book.location}
+📖 Condition: ${book.condition}
+🖼️ Image: ${book.images.isNotEmpty ? book.images[0] : 'No image available'}
+
+Check out this amazing book on Khojo Pustak! 🔥
+''';
+
+    Share.share(bookDetails);
+  }
+
 
   // ✅ Check if current book is already in favourites
   Future<void> _checkIfFavourite() async {
@@ -113,7 +130,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         actions: [
           IconButton(
             icon: const Icon(FeatherIcons.share2, size: 22),
-            onPressed: () {},
+            onPressed: () {
+              _shareBookDetails(book);
+            },
           ),
           IconButton(
             onPressed: () => _favouritetoggle(book),

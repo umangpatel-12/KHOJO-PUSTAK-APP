@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SubcategoryModel {
   final String cname;
-  final String? id;
+  final String categoryId;
 
   SubcategoryModel({
-    this.id,
+    required this.categoryId,
     required this.cname,
   });
 
@@ -13,6 +13,7 @@ class SubcategoryModel {
     return SubcategoryModel(
       // id: snapshot.id,
       cname: snapshot['cname'],
+      categoryId: snapshot['categoryId'],
     );
   }
 }

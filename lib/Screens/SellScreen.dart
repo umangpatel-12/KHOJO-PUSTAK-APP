@@ -64,7 +64,7 @@ class _SellScreenState extends State<SellScreen> {
           .map((subDoc) => subDoc['cname'].toString())
           .toList();
 
-      categories.add(CategoryModel(cname: catName, Subcategory: subCats));
+      categories.add(CategoryModel(cname: catName, Subcategory: subCats, categoryId: ''));
     }
 
     setState(() {});
@@ -127,7 +127,7 @@ class _SellScreenState extends State<SellScreen> {
         final bookData = {
           'title': titleController.text,
           'author': authorController.text,
-          'category': selectedCategory,
+          'categoryId': selectedCategory,
           'description': '', // you can add a controller for description if needed
           'images': uploadedUrls,
           'userId': user?.uid ?? '',
