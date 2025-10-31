@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await preferences.setBool('isLoggedIn', true);
         }
 
-        // Navigate to Screens Page
+        // Navigate to MainScreens Page
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login Successful ✅")),
         );

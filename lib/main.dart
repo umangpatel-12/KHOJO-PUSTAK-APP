@@ -2,8 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'Screens/Authentication/LoginScreen.dart';
-import 'Screens/BottomNavigationBar/BottomNavBar.dart';
+import 'MainScreens/Authentication/LoginScreen.dart';
+import 'MainScreens/BottomNavigationBar/BottomNavBar.dart';
 
 Future<void> main() async {
 

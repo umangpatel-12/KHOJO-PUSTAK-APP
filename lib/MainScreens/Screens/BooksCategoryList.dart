@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../Widgets/CardLayouts/ButtonLayout.dart';
-import '../Widgets/Models/BookModel.dart';
+import '../../Widgets/CardLayouts/ButtonLayout.dart';
+import '../../Widgets/Models/BookModel.dart';
 import 'BookDetailsScreen.dart';
 
 class BooksCategoryList extends StatefulWidget {

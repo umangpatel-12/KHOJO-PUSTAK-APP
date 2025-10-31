@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:khojpustak/Screens/BooksListScreen.dart';
-import 'package:khojpustak/Screens/SubCategoryScreen.dart';
 import 'package:khojpustak/Widgets/CardLayouts/ButtonLayout.dart';
 import 'package:khojpustak/Widgets/Models/CategoryModel.dart';
+
+import 'BooksListScreen.dart';
+import 'SubCategoryScreen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});

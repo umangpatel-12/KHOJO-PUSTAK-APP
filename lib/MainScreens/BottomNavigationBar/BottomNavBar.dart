@@ -5,15 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:khojpustak/Screens/Profile/MyActivity/WishlishListsScreen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../ExploreScreen.dart';
-import '../HomeScreen.dart';
-import '../MyBooksScreen.dart';
 import '../Profile/ProfileScreen.dart';
-import '../SellScreen.dart';
+import '../Screens/ExploreScreen.dart';
+import '../Screens/HomeScreen.dart';
+import '../Screens/MyBooksScreen.dart';
+import '../Screens/SellScreen.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
   const CustomBottomNavBar({super.key});

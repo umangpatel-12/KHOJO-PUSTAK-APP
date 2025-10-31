@@ -1,11 +1,11 @@
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:khojpustak/Screens/BookDetailsScreen.dart';
 import 'package:khojpustak/Widgets/CardLayouts/ButtonLayout.dart';
 import 'package:shimmer/shimmer.dart';
-import '../Widgets/Models/BookModel.dart';
-import '../Widgets/Models/CategoryModel.dart';
+import '../../Widgets/Models/BookModel.dart';
+import '../../Widgets/Models/CategoryModel.dart';
+import 'BookDetailsScreen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});

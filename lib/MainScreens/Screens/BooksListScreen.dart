@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:khojpustak/Screens/BookDetailsScreen.dart';
 import 'package:khojpustak/Widgets/CardLayouts/ButtonLayout.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../Widgets/Models/BookModel.dart';
+import '../../Widgets/Models/BookModel.dart';
+import 'BookDetailsScreen.dart';
 
 class Bookslistscreen extends StatefulWidget {
   const Bookslistscreen({super.key, required this.categoryName});

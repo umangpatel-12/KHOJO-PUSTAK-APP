@@ -139,7 +139,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
           'createdAt': DateTime.now().toIso8601String(), // Realtime DB timestamp
         });
 
-        //Navigate to Screens Page
+        //Navigate to MainScreens Page
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful ✅")),
         );
