@@ -205,6 +205,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             price: double.tryParse(data['price'].toString()) ?? 0.0,
                             userId: data['userId'] ?? '',
                             author: data['author'] ?? 'Unknown',
+                            oldprice: double.tryParse(data['oldprice'].toString()) ?? 0.0,
                           );
 
                       if (_isLoading) {

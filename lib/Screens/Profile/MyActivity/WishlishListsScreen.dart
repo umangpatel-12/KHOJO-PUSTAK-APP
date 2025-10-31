@@ -139,12 +139,12 @@ class _WishlishListScreenState extends State<WishlishListScreen> {
                                       ),
                                       Row(
                                         children: [
-                                          const Text("₹399",
+                                          Text("₹ ${favourite['price'] ?? ''}",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
                                           const SizedBox(width: 6),
-                                          const Text(
-                                            "₹599",
+                                          Text(
+                                            "₹ ${favourite['oldprice'] ?? ''}",
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 decoration: TextDecoration.lineThrough),

@@ -110,6 +110,7 @@ class _BookslistscreenState extends State<Bookslistscreen> {
                   price: double.tryParse(myBooks['price'].toString()) ?? 0.0,
                   userId: myBooks['userId'] ?? '',
                   author: myBooks['author'] ?? 'Unknown',
+                  oldprice: double.tryParse(myBooks['oldprice'].toString()) ?? 0.0,
                 );
 
                 return Container(

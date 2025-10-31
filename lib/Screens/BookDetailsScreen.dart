@@ -90,7 +90,8 @@ Check out this amazing book on Khojo Pustak! 🔥
         'title': book.title,
         'price': book.price,
         'images': book.images,
-        'phone': book.phone,
+        'phone': book.phone.toString(),
+        'oldprice': book.oldprice.toString(),
         'category': book.category,
         'condition': book.condition,
         'location': book.location,
@@ -213,8 +214,8 @@ Check out this amazing book on Khojo Pustak! 🔥
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        "₹599",
+                      Text(
+                        "₹${book.oldprice}",
                         style: TextStyle(
                           color: Colors.black38,
                           decoration: TextDecoration.lineThrough,

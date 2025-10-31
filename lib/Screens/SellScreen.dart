@@ -23,6 +23,15 @@ class _SellScreenState extends State<SellScreen> {
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController authorController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController originalPriceController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController conditionController = TextEditingController();
+
+
+
   String? profilePic;
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
@@ -32,6 +41,9 @@ class _SellScreenState extends State<SellScreen> {
   List<CategoryModel> categories = [];
   String? selectedCategory;
   String? selectedSubcategory;
+  String? selectedCategoryId; // 🆕 For Firestore category document ID
+  String? selectedSubcategoryId; // (optional)
+  String? selectedCondition;
   bool isDropdownOpen = false;
   String? expandedCategory;
 
@@ -96,23 +108,23 @@ class _SellScreenState extends State<SellScreen> {
 
   // Upload and Save to Database
   Future<void> _uploadAndSave() async {
-      if (_images.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please add at least one book photo')),
-        );
-        return;
-      }
+    if (_images.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please add at least one book photo')),
+      );
+      return;
+    }
 
-      if (titleController.text.isEmpty || authorController.text.isEmpty || selectedCategory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please fill all required book details')),
-        );
-        return;
-      }
+    if (titleController.text.isEmpty || authorController.text.isEmpty || selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required book details')),
+      );
+      return;
+    }
 
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
       try {
         // 1️⃣ Upload images to Cloudinary
@@ -127,17 +139,24 @@ class _SellScreenState extends State<SellScreen> {
         final bookData = {
           'title': titleController.text,
           'author': authorController.text,
-          'categoryId': selectedCategory,
-          'description': '', // you can add a controller for description if needed
+          'category': selectedCategory,
+          'subcategory': selectedSubcategory,
+          'categoryId': selectedSubcategoryId ?? selectedCategoryId, // ✅ Added field
+          'description': descriptionController.text,
+          'price': priceController.text,
+          'oldprice': originalPriceController.text,
+          'condition': selectedCondition,
           'images': uploadedUrls,
           'userId': user?.uid ?? '',
           'createdAt': FieldValue.serverTimestamp(),
         };
 
+
+
         // 3️⃣ Prepare contact info
         final contactData = {
-          'location': '', // add a controller if you want
-          'phone': '',    // add a controller if you want
+          'location': locationController.text, // add a controller if you want
+          'phone': phoneController.text,    // add a controller if you want
         };
 
         // 4️⃣ Save to Firestore
@@ -474,7 +493,7 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 2),
                     TextField(
-                      // controller: _fullName,
+                      controller: titleController,
                       decoration:
                       _buildDecoration('Enter book title'),
                       keyboardType: TextInputType.name,
@@ -493,7 +512,7 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 2),
                     TextField(
-                      // controller: _email,
+                      controller: authorController,
                       decoration:
                       _buildDecoration('Enter author name'),
                       keyboardType: TextInputType.emailAddress,
@@ -512,7 +531,6 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 2),
                     // Category Dropdown
-
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -521,6 +539,7 @@ class _SellScreenState extends State<SellScreen> {
                           onTap: () {
                             setState(() {
                               isDropdownOpen = !isDropdownOpen;
+
                               expandedCategory = null; // collapse all categories initially
                             });
                           },
@@ -580,10 +599,13 @@ class _SellScreenState extends State<SellScreen> {
                                             setState(() {
                                               expandedCategory = isExpanded ? null : cat.cname;
                                               selectedCategory = cat.cname;
+                                              selectedCategoryId = cat.categoryId;
                                             });
                                           } else {
                                             setState(() {
                                               selectedCategory = cat.cname;
+                                              selectedCategoryId = cat.categoryId;
+                                              selectedSubcategoryId = null;
                                               selectedSubcategory = null;
                                               isDropdownOpen = false;
                                             });
@@ -607,6 +629,7 @@ class _SellScreenState extends State<SellScreen> {
                                                   onTap: () {
                                                     setState(() {
                                                       selectedSubcategory = sub;
+                                                      selectedCategoryId = '${cat.categoryId}_$sub';
                                                       isDropdownOpen = false;
                                                     });
                                                     print(
@@ -631,6 +654,79 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 14),
 
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Your Price(₹) *', style: TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 2),
+                              TextField(
+                                controller: priceController,
+                                decoration: _buildDecoration('199'),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Original Price(₹) *', style: TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 2),
+                              TextField(
+                                controller: originalPriceController,
+                                decoration: _buildDecoration('459'),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 14),
+
+                    // 🔽 Condition Dropdown
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Condition *',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedCondition,
+                          hint: Text("Select Condition"),
+                          isExpanded: true,
+                          items: ["Excellent", "Good", "Poor"]
+                              .map((cond) => DropdownMenuItem(
+                            value: cond,
+                            child: Text(cond),
+                          ))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedCondition = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
 
                     Align(
                       alignment: Alignment.centerLeft,
@@ -644,10 +740,11 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 2),
                     TextField(
-                      // controller: _phone,
+                      controller: descriptionController,
                       decoration: _buildDecoration('Describe the book condition, any highlights, missing pages etc.'),
-                      keyboardType: TextInputType.streetAddress,
-                      minLines: 1,
+                      keyboardType: TextInputType.multiline,
+                      minLines: 2,
+                      maxLines: 6,
                     ),
 
                   ],
@@ -705,7 +802,7 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 2),
                     TextField(
-                      // controller: _fullName,
+                      controller: locationController,
                       decoration:
                       _buildDecoration('e.g., Gujarat University,Sector-1,Ahmedabad'),
                       keyboardType: TextInputType.streetAddress,
@@ -724,7 +821,7 @@ class _SellScreenState extends State<SellScreen> {
                     ),
                     const SizedBox(height: 2),
                     TextField(
-                      // controller: _email,
+                      controller: phoneController,
                       decoration:
                       _buildDecoration('Enter phone number'),
                       keyboardType: TextInputType.phone,

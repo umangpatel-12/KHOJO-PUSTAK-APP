@@ -257,8 +257,8 @@ class _ListingBookScreenState extends State<ListingBookScreen> {
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
                                       const SizedBox(width: 6),
-                                      const Text(
-                                        "₹599",
+                                      Text(
+                                        "₹${book['oldprice'] ?? ''}",
                                         style: TextStyle(
                                             color: Colors.grey,
                                             decoration: TextDecoration.lineThrough),

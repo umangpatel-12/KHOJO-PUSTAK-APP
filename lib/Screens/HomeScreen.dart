@@ -474,6 +474,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         price: double.tryParse(data['price'].toString()) ?? 0.0,
                         userId: data['userId'] ?? '',
                         author: data['author'] ?? 'Unknown',
+                        oldprice: double.tryParse(data['oldprice'].toString()) ?? 0.0,
                       );
 
                       return Card(
