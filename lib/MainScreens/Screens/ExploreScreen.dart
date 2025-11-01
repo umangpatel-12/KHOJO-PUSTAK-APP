@@ -202,10 +202,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             condition: data['condition'] ?? 'Good',
                             location: data['location'] ?? '',
                             phone: data['phone'] ?? '',
-                            price: double.tryParse(data['price'].toString()) ?? 0.0,
+                            price: data['price'] ?? 0,
                             userId: data['userId'] ?? '',
                             author: data['author'] ?? 'Unknown',
-                            oldprice: double.tryParse(data['oldprice'].toString()) ?? 0.0,
+                            originalPrice: data['originalPrice'] ?? 0,
                           );
 
                       if (_isLoading) {
@@ -264,16 +264,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                       fit: BoxFit.cover,
                                     ),
                                   ),
-                                  Positioned(
-                                    top: 4,
-                                    right: 4,
-                                    child: CircleAvatar(
-                                      radius: 14,
-                                      backgroundColor: Colors.white.withOpacity(0.6),
-                                      child: const Icon(Icons.favorite_border,
-                                          color: Colors.white70, size: 18),
-                                    ),
-                                  ),
+                                  // Positioned(
+                                  //   top: 4,
+                                  //   right: 4,
+                                  //   child: CircleAvatar(
+                                  //     radius: 14,
+                                  //     backgroundColor: Colors.white.withOpacity(0.6),
+                                  //     child: const Icon(Icons.favorite_border,
+                                  //         color: Colors.white70, size: 18),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                               const SizedBox(height: 6),
@@ -294,24 +294,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: const [
+                                        children: [
+                                          Text("₹${book['price'] ?? ''}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold, fontSize: 14,color: Colors.green)),
+                                          const SizedBox(width: 6),
                                           Text(
-                                            '₹499',
+                                            "₹${book['originalPrice'] ?? ''}",
                                             style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.green,
-                                            ),
+                                                color: Colors.grey,
+                                                fontSize: 11,
+                                                decoration: TextDecoration.lineThrough),
                                           ),
-                                          Text(
-                                            '₹699',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.grey,
-                                              decoration: TextDecoration.lineThrough,
-                                            ),
-                                          ),
+                                          SizedBox(width: 16,),
                                         ],
                                       ),
                                     ],

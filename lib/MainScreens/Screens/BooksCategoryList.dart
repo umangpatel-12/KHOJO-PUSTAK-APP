@@ -109,10 +109,10 @@ class _BooksCategoryListState extends State<BooksCategoryList> {
                   condition: myBooks['condition'] ?? 'Good',
                   location: myBooks['location'] ?? '',
                   phone: myBooks['phone'] ?? '',
-                  price: double.tryParse(myBooks['price'].toString()) ?? 0.0,
+                  price: myBooks['price'] ?? 0.0,
                   userId: myBooks['userId'] ?? '',
                   author: myBooks['author'] ?? 'Unknown',
-                  oldprice: double.tryParse(myBooks['oldprice'].toString()) ?? 0.0,
+                  originalPrice: myBooks['originalPrice'],
                 );
 
                 return Container(

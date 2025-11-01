@@ -31,7 +31,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 📚 *Name: ${book.title}*  
 ✍️ Author: ${book.author}  
 🏷️ Category: ${book.category}  
-💰 Price: ₹${book.price.toStringAsFixed(2)}  
+💰 Price: ₹${book.price}  
 📍 Location: ${book.location}
 📖 Condition: ${book.condition}
 🖼️ Image: ${book.images.isNotEmpty ? book.images[0] : 'No image available'}
@@ -80,7 +80,7 @@ Check out this amazing book on Khojo Pustak! 🔥
       setState(() {
         isFavourite = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of( context ).showSnackBar(
         const SnackBar(content: Text('Removed from favourite list')),
       );
     } else {
@@ -90,8 +90,8 @@ Check out this amazing book on Khojo Pustak! 🔥
         'title': book.title,
         'price': book.price,
         'images': book.images,
-        'phone': book.phone.toString(),
-        'oldprice': book.oldprice.toString(),
+        'phone': book.phone,
+        'originalPrice': book.originalPrice,
         'category': book.category,
         'condition': book.condition,
         'location': book.location,
@@ -128,9 +128,10 @@ Check out this amazing book on Khojo Pustak! 🔥
         backgroundColor: Colors.white60,
         shadowColor: Colors.black12,
         elevation: 1,
+        iconTheme: IconThemeData(color: Colors.green,size: 22),
         actions: [
           IconButton(
-            icon: const Icon(FeatherIcons.share2, size: 22),
+            icon: const Icon(FeatherIcons.share2, size: 21),
             onPressed: () {
               _shareBookDetails(book);
             },
@@ -206,21 +207,17 @@ Check out this amazing book on Khojo Pustak! 🔥
                   // ✅ Price
                   Row(
                     children: [
+                      Text("₹ ${book.price} ",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
+                      const SizedBox(width: 6),
                       Text(
-                        "₹${book.price}",
-                        style: const TextStyle(
-                          fontSize: 22,
-                          color: Colors.green,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "₹${book.oldprice}",
+                        "₹${book.originalPrice}",
                         style: TextStyle(
-                          color: Colors.black38,
-                          decoration: TextDecoration.lineThrough,
-                        ),
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough),
                       ),
+                      SizedBox(width: 16,),
                     ],
                   ),
 

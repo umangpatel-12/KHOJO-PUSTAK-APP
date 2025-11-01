@@ -461,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       final doc = snapshot.data!.docs[index];
-                      final data = doc.data() as Map<String, dynamic>;
+                      final data = doc.data();
 
                       BookModel bookmodel = BookModel(
                         title: data['title'] ?? '',
@@ -471,19 +471,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         condition: data['condition'] ?? 'Good',
                         location: data['location'] ?? '',
                         phone: data['phone'] ?? '',
-                        price: double.tryParse(data['price'].toString()) ?? 0.0,
+                        price: data['price'] ?? 0,
                         userId: data['userId'] ?? '',
                         author: data['author'] ?? 'Unknown',
-                        oldprice: double.tryParse(data['oldprice'].toString()) ?? 0.0,
+                        originalPrice: data['originalPrice'] ?? 0,
                       );
 
                       return Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 4,
                         margin:
-                        const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -499,8 +499,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       topRight: Radius.circular(12),
                                     ),
                                     child: Image.network(
-                                      bookmodel.images.isNotEmpty
-                                          ? bookmodel.images[0]
+                                      data['images'].isNotEmpty
+                                          ? data['images'][0]
                                           : 'https://via.placeholder.com/150',
                                       height: 160,
                                       width: double.infinity,
@@ -533,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Chip(
-                                    label: Text(bookmodel.category),
+                                    label: Text(data['category']),
                                     backgroundColor: const Color(0xffe8f0fe),
                                     labelStyle: const TextStyle(fontSize: 12),
                                     padding: EdgeInsets.zero,
@@ -541,14 +541,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    bookmodel.title,
+                                    data['title'],
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   Text(
-                                    "by ${bookmodel.author ?? 'Unknown Author'}",
+                                    "by ${data['author'] ?? 'Unknown Author'}",
                                     style: const TextStyle(color: Colors.grey),
                                   ),
                                   const SizedBox(height: 6),
@@ -566,7 +566,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        "₹${bookmodel.price}",
+                                        "₹${data['price']}",
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
@@ -574,8 +574,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       const SizedBox(width: 6),
-                                      const Text(
-                                        "₹599",
+                                      Text(
+                                        "₹ ${data['originalPrice']}",
                                         style: TextStyle(
                                           color: Colors.grey,
                                           decoration: TextDecoration.lineThrough,

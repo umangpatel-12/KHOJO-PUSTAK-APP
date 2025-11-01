@@ -144,7 +144,7 @@ class _SellScreenState extends State<SellScreen> {
           'categoryId': selectedSubcategoryId ?? selectedCategoryId, // ✅ Added field
           'description': descriptionController.text,
           'price': priceController.text,
-          'oldprice': originalPriceController.text,
+          'originalPrice': originalPriceController.text,
           'condition': selectedCondition,
           'images': uploadedUrls,
           'userId': user?.uid ?? '',

@@ -107,10 +107,10 @@ class _BookslistscreenState extends State<Bookslistscreen> {
                   condition: myBooks['condition'] ?? 'Good',
                   location: myBooks['location'] ?? '',
                   phone: myBooks['phone'] ?? '',
-                  price: double.tryParse(myBooks['price'].toString()) ?? 0.0,
+                  price: myBooks['price'] ?? 0,
                   userId: myBooks['userId'] ?? '',
                   author: myBooks['author'] ?? 'Unknown',
-                  oldprice: double.tryParse(myBooks['oldprice'].toString()) ?? 0.0,
+                  originalPrice: myBooks['originalPrice'] ?? 0,
                 );
 
                 return Container(
@@ -174,13 +174,13 @@ class _BookslistscreenState extends State<Bookslistscreen> {
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              const Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
                                       Text(
-                                        '₹499',
+                                        '₹${myBooks['price'] ?? ''}',
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
@@ -189,7 +189,7 @@ class _BookslistscreenState extends State<Bookslistscreen> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        '₹699',
+                                        '₹${myBooks['originalPrice'] ?? ''}',
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.grey,

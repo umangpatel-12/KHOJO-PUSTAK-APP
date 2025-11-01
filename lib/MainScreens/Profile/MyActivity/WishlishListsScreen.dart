@@ -144,7 +144,7 @@ class _WishlishListScreenState extends State<WishlishListScreen> {
                                                   fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
                                           const SizedBox(width: 6),
                                           Text(
-                                            "₹ ${favourite['oldprice'] ?? ''}",
+                                            "₹ ${favourite['originalPrice'] ?? ''}",
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 decoration: TextDecoration.lineThrough),

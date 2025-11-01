@@ -4,8 +4,8 @@ class BookModel {
   final String category;
   final List<String> images;
   final String description;
-  final double price;
-  final double oldprice;
+  final String price;
+  final String originalPrice;
   final String condition;
   final bool isFavorite;
   final String location;
@@ -23,7 +23,7 @@ class BookModel {
     required this.phone,
     required this.price,
     required this.userId,
-    required this.oldprice,
+    required this.originalPrice,
     this.isFavorite = false,
   });
 
@@ -33,7 +33,7 @@ class BookModel {
       author: data['author'] ?? '',
       images: data['images'] ?? '',
       price: data['price'] ?? 0,
-      oldprice: data['oldprice'] ?? 0,
+      originalPrice: data['originalPrice'] ?? 0,
       userId: data['userId'] ?? '',
       category: data['category'] ?? '',
       description: data['description'] ?? '',
