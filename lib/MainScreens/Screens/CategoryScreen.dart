@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:khojpustak/MainScreens/Screens/BooksCategoryList.dart';
 import 'package:khojpustak/Widgets/CardLayouts/ButtonLayout.dart';
 import 'package:khojpustak/Widgets/Models/CategoryModel.dart';
 
@@ -83,10 +84,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 final color = categoryColors[index % categoryColors.length];
                 final String categoryId = doc['categoryId'];
 
-
-
                 CategoryModel categoryModel = CategoryModel(
-                  cname: doc['cname'], Subcategory: [], categoryId: categoryId,
+                  cname: doc['cname'],
+                  Subcategory: [],
+                  categoryId: categoryId,
                 );
 
 
@@ -106,7 +107,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       Navigator.push(context, createRoute(SubCategoryScreen(categoryId: categoryId, categoryName: categoryModel.cname)));
                     } else {
                       // ❌ No subcategories → go to BooksListScreen
-                      Navigator.push(context, createRoute(Bookslistscreen(categoryName: categoryModel.cname)));
+                      Navigator.push(context, createRoute(BooksCategoryList(categoryName: categoryModel.cname,categoryId: categoryModel.categoryId, subcategoryId: '', subcategoryName: '',)));
                     }
                   },
                   child: Container(

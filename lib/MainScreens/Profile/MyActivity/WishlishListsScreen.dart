@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WishlishListScreen extends StatefulWidget {
   const WishlishListScreen({super.key});
@@ -12,6 +13,36 @@ class WishlishListScreen extends StatefulWidget {
 
 class _WishlishListScreenState extends State<WishlishListScreen> {
   final user = FirebaseAuth.instance.currentUser;
+
+  Future<void> _RemoveWishlistBook() async{
+    final user = FirebaseAuth.instance.currentUser;
+    if(user == null) return ;
+
+    final wishlist = FirebaseFirestore.instance.collection('Favourite');
+    final existing = await wishlist.where('userId', isEqualTo: user.uid).get();
+    if(existing.docs.isNotEmpty){
+      await wishlist.doc(existing.docs.first.id).delete();
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Item removed from wishlist")),
+    );
+  }
+
+  Future<void> _makePhoneCall(String phone) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phone,
+    );
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      throw 'Could not launch $phone';
+    }
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text('Calling $phone')),
+    // );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,34 +200,8 @@ class _WishlishListScreenState extends State<WishlishListScreen> {
                                             ),
                                           ]
                                       ),
-
-                                      // OutlinedButton.icon(
-                                      //     onPressed: () {},
-                                      //     label: Text(
-                                      //         "Remove",
-                                      //       style: TextStyle(
-                                      //         color: Colors.red,
-                                      //         fontSize: 14,
-                                      //         fontWeight: FontWeight.w600,
-                                      //       ),
-                                      //     ),
-                                      //   icon: Icon(
-                                      //       Icons.highlight_remove_sharp,
-                                      //     color: Colors.red,
-                                      //   ),
-                                      //   style: OutlinedButton.styleFrom(
-                                      //     side: BorderSide(
-                                      //         color: Colors.red.shade200, width: 1.2),
-                                      //     padding: const EdgeInsets.all(14),
-                                      //     shape: RoundedRectangleBorder(
-                                      //       borderRadius: BorderRadius.circular(10),
-                                      //     ),
-                                      //   ),
-                                      // ),
-
                                     ],
                                   ),
-
                                 ],
                               ),
 
@@ -206,7 +211,9 @@ class _WishlishListScreenState extends State<WishlishListScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   OutlinedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      _makePhoneCall(favourite['phone']);
+                                    },
                                     style: OutlinedButton.styleFrom(
                                       iconColor: Colors.green,
                                       side: BorderSide(
@@ -228,7 +235,38 @@ class _WishlishListScreenState extends State<WishlishListScreen> {
                                   ),
 
                                   OutlinedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      bool? confirm = await showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text("Remove Item"),
+                                          content: const Text("Are you sure you want to remove this item?"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context, false),
+                                              child: const Text("Cancel"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                _RemoveWishlistBook();
+                                                Navigator.pop(context, true);
+                                              },
+                                              child: const Text("Remove"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      if (confirm == true) {
+                                        await FirebaseFirestore.instance
+                                            .collection('Wishlist')
+                                            .doc(favourite['id'])
+                                            .delete();
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Item removed from wishlist")),
+                                        );
+                                      }
+                                    },
                                     style: OutlinedButton.styleFrom(
                                       iconColor: Colors.red,
                                       side: BorderSide(

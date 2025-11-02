@@ -268,7 +268,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               final String categoryId = doc['categoryId'];
 
                               CategoryModel categoryModel =
-                              CategoryModel(cname: doc['cname'], Subcategory: [], categoryId: categoryId);
+                              CategoryModel(
+                                  cname: doc['cname'],
+                                  categoryId: categoryId, Subcategory: []
+                              );
 
                               return InkWell(
                                 borderRadius: BorderRadius.circular(12),
@@ -289,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   } else {
                                     Navigator.push(
                                         context,
-                                        createRoute(BooksCategoryList(categoryName: categoryModel.cname, categoryId: categoryModel.categoryId,)));
+                                        createRoute(BooksCategoryList(categoryName: categoryModel.cname, categoryId: categoryModel.categoryId, subcategoryId: '', subcategoryName: '',)));
                                   }
                                 },
                                 child: Container(
@@ -475,6 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         userId: data['userId'] ?? '',
                         author: data['author'] ?? 'Unknown',
                         originalPrice: data['originalPrice'] ?? 0,
+                        id: doc.id,
                       );
 
                       return Card(

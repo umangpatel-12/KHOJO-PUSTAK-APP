@@ -1,4 +1,5 @@
 class BookModel {
+  final String id;
   final String title;
   final String? author;
   final String category;
@@ -13,6 +14,7 @@ class BookModel {
   final String userId;
 
   const BookModel({
+    required this.id,
     required this.title,
     this.author,
     required this.category,
@@ -29,6 +31,7 @@ class BookModel {
 
   factory BookModel.fromDocument(Map<String, dynamic> data, String docId) {
     return BookModel(
+      id: docId,
       title: data['title'] ?? '',
       author: data['author'] ?? '',
       images: data['images'] ?? '',

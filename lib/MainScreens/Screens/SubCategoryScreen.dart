@@ -202,14 +202,24 @@ class _SubCategoryScreenState extends State<SubCategoryScreen> {
                 final color = categoryColors[index % categoryColors.length];
 
                 SubcategoryModel subcategoryModel = SubcategoryModel(
-                    cname: doc['cname'], categoryId: doc['categoryId']
+                    cname: doc['cname'],
+                    categoryId: doc['categoryId'],
+                    subcategoryId: doc.id
                 );
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
+                    print('Subcategory tapped: ${subcategoryModel.categoryId}');
                     // You can navigate to BooksListScreen for this subcategory
-                    Navigator.push(context, createRoute(BooksCategoryList(categoryName: subcategoryModel.cname,categoryId: subcategoryModel.categoryId)));
+                    Navigator.push(context, createRoute(
+                      BooksCategoryList(
+                        categoryName: widget.categoryName,
+                        categoryId: widget.categoryId,
+                        subcategoryId: doc.id, // 👈 subcategory document ID
+                        subcategoryName: doc['cname'], // 👈 subcategory name
+                      ),
+                    ));
                   },
                   child: Container(
                     decoration: BoxDecoration(

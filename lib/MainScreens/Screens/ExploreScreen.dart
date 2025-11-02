@@ -195,6 +195,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
                           // ✅ Safely extract all fields
                           BookModel bookmodel = BookModel(
+                            id: data['id'],
                             title: data['title'] ?? '',
                             category: data['category'] ?? '',
                             images: List<String>.from(data['images'] ?? []),

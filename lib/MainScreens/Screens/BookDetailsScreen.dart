@@ -6,6 +6,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:khojpustak/Widgets/Models/BookModel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   final BookModel book;
@@ -24,6 +25,21 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   void initState() {
     super.initState();
     _checkIfFavourite();
+  }
+
+  Future<void> _makePhoneCall(String phone) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phone,
+    );
+    if (await canLaunchUrl(launchUri)) {
+    await launchUrl(launchUri);
+    } else {
+    throw 'Could not launch $phone';
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Calling $phone')),
+    );
   }
 
   void _shareBookDetails(BookModel book) {
@@ -70,7 +86,7 @@ Check out this amazing book on Khojo Pustak! 🔥
     final favCollection = FirebaseFirestore.instance.collection('Favourite');
     final existing = await favCollection
         .where('userId', isEqualTo: user.uid)
-        .where('title', isEqualTo: book.title)
+        .where('bookId', isEqualTo: book.title)
         .limit(1)
         .get();
 
@@ -88,6 +104,7 @@ Check out this amazing book on Khojo Pustak! 🔥
       await favCollection.add({
         'userId': user.uid,
         'title': book.title,
+        'bookId': book.id,
         'price': book.price,
         'images': book.images,
         'phone': book.phone,
@@ -228,11 +245,7 @@ Check out this amazing book on Khojo Pustak! 🔥
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Contact Seller: ${book.phone}'),
-                          ),
-                        );
+                        _makePhoneCall(book.phone);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryGreen,

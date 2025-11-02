@@ -54,6 +54,7 @@ class _SellScreenState extends State<SellScreen> {
     _uploadAndSave();
   }
 
+  // 🔥 Fetch Categories & Subcategories from Firestore
   Future<void> fetchCategories() async {
     categories = [];
 
@@ -61,22 +62,27 @@ class _SellScreenState extends State<SellScreen> {
     await FirebaseFirestore.instance.collection('Category').get();
 
     for (var catDoc in catSnapshot.docs) {
-      String catName = catDoc.data().toString().contains('cname')
-          ? catDoc['cname']
-          : '';
+      String catName = catDoc['cname'];
+      String catId = catDoc.id;
 
       QuerySnapshot subSnapshot = await FirebaseFirestore.instance
           .collection('Category')
-          .doc(catDoc.id)
+          .doc(catId)
           .collection('Subcategory')
           .get();
 
-      List<String> subCats = subSnapshot.docs
-          .where((subDoc) => subDoc.data().toString().contains('cname'))
-          .map((subDoc) => subDoc['cname'].toString())
-          .toList();
+      List<Map<String, dynamic>> subCats = subSnapshot.docs.map((subDoc) {
+        return {
+          'id': subDoc.id,
+          'name': subDoc['cname'],
+        };
+      }).toList();
 
-      categories.add(CategoryModel(cname: catName, Subcategory: subCats, categoryId: ''));
+      categories.add(CategoryModel(
+        cname: catName,
+        categoryId: catId,
+        Subcategory: subCats,
+      ));
     }
 
     setState(() {});
@@ -126,67 +132,68 @@ class _SellScreenState extends State<SellScreen> {
       _isLoading = true;
     });
 
-      try {
-        // 1️⃣ Upload images to Cloudinary
-        List<String> uploadedUrls = [];
-        for (var img in _images) {
-          final url = await _uploadToCloudinary(img);
-          uploadedUrls.add(url);
-        }
-
-        // 2️⃣ Prepare book data
-        final user = FirebaseAuth.instance.currentUser;
-        final bookData = {
-          'title': titleController.text,
-          'author': authorController.text,
-          'category': selectedCategory,
-          'subcategory': selectedSubcategory,
-          'categoryId': selectedSubcategoryId ?? selectedCategoryId, // ✅ Added field
-          'description': descriptionController.text,
-          'price': priceController.text,
-          'originalPrice': originalPriceController.text,
-          'condition': selectedCondition,
-          'images': uploadedUrls,
-          'userId': user?.uid ?? '',
-          'createdAt': FieldValue.serverTimestamp(),
-        };
-
-
-
-        // 3️⃣ Prepare contact info
-        final contactData = {
-          'location': locationController.text, // add a controller if you want
-          'phone': phoneController.text,    // add a controller if you want
-        };
-
-        // 4️⃣ Save to Firestore
-        await FirebaseFirestore.instance.collection('Books').add({
-          ...bookData,
-          ...contactData,
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Book listed successfully!')),
-        );
-
-        // Clear all fields
-        setState(() {
-          _images.clear();
-          titleController.clear();
-          authorController.clear();
-          selectedCategory = null;
-          selectedSubcategory = null;
-        });
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving book: $e')),
-        );
-        print('Error: $e');
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
+    try {
+      // 1️⃣ Upload images to Cloudinary
+      List<String> uploadedUrls = [];
+      for (var img in _images) {
+        final url = await _uploadToCloudinary(img);
+        uploadedUrls.add(url);
       }
+
+      // 2️⃣ Prepare book data
+      final user = FirebaseAuth.instance.currentUser;
+      final bookData = {
+        'title': titleController.text,
+        'author': authorController.text,
+        'category': selectedCategory,
+        'categoryId': selectedCategoryId,
+        'subcategory': selectedSubcategory,
+        'subcategoryId': selectedSubcategoryId,
+        'description': descriptionController.text,
+        'price': priceController.text,
+        'originalPrice': originalPriceController.text,
+        'condition': selectedCondition,
+        'images': uploadedUrls,
+        'userId': user?.uid ?? '',
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
+
+
+      // 3️⃣ Prepare contact info
+      final contactData = {
+        'location': locationController.text, // add a controller if you want
+        'phone': phoneController.text,    // add a controller if you want
+      };
+
+      // 4️⃣ Save to Firestore
+      await FirebaseFirestore.instance.collection('Books').add({
+        ...bookData,
+        ...contactData,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Book listed successfully!')),
+      );
+
+      // Clear all fields
+      setState(() {
+        _images.clear();
+        titleController.clear();
+        authorController.clear();
+        selectedCategory = null;
+        selectedSubcategory = null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving book: $e')),
+      );
+      print('Error: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
 
   }
 
@@ -250,7 +257,7 @@ class _SellScreenState extends State<SellScreen> {
             style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
-              fontSize: 20
+                fontSize: 20
             ),
           ),
           centerTitle: true,
@@ -470,9 +477,9 @@ class _SellScreenState extends State<SellScreen> {
                         const Text(
                           "Book Details",
                           style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            color: Colors.black87
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              color: Colors.black87
                           ),
                         ),
                       ],
@@ -625,15 +632,17 @@ class _SellScreenState extends State<SellScreen> {
                                               return Padding(
                                                 padding: const EdgeInsets.only(left: 20),
                                                 child: ListTile(
-                                                  title: Text(sub),
+                                                  title: Text(sub['name'].toString()),
                                                   onTap: () {
                                                     setState(() {
-                                                      selectedSubcategory = sub;
-                                                      selectedCategoryId = '${cat.categoryId}_$sub';
+                                                      selectedCategory = cat.cname;
+                                                      selectedCategoryId = cat.categoryId;
+                                                      selectedSubcategory = sub['name'];
+                                                      selectedSubcategoryId = sub['id']; // ✅ save Firestore ID
                                                       isDropdownOpen = false;
                                                     });
-                                                    print(
-                                                        "Selected: $selectedCategory -> $selectedSubcategory");
+                                                    print("Selected Category ID: $selectedCategoryId");
+                                                    print("Selected Subcategory ID: $selectedSubcategoryId");
                                                   },
                                                 ),
                                               );
@@ -871,22 +880,22 @@ class _SellScreenState extends State<SellScreen> {
                     SizedBox(height: 20,),
 
                     SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _uploadAndSave,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _uploadAndSave,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                           ),
-                          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                        ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text('List Book for Sale'),
-                      )
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text('List Book for Sale'),
+                        )
 
                     ),
                   ],
@@ -905,22 +914,22 @@ class _SellScreenState extends State<SellScreen> {
 Widget bulletPoint(String text) {
   return
     Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "• ",
-          style: TextStyle(fontSize: 14, color: Colors.blue),
-        ),
-        Expanded(
-          child: Text(
-            text,
-            textAlign: TextAlign.justify,
-            style: const TextStyle(fontSize: 14, color: Colors.blue),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "• ",
+            style: TextStyle(fontSize: 14, color: Colors.blue),
           ),
-        ),
-      ],
-    ),
-  );
+          Expanded(
+            child: Text(
+              text,
+              textAlign: TextAlign.justify,
+              style: const TextStyle(fontSize: 14, color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
 }

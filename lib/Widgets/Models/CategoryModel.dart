@@ -1,7 +1,11 @@
 class CategoryModel {
   final String cname;
   final String categoryId;
-  final List<String> Subcategory;
+  final List<Map<String, dynamic>> Subcategory;
 
-  CategoryModel({required this.cname, required this.Subcategory, required this.categoryId});
+  CategoryModel({
+    required this.cname,
+    required this.categoryId,
+    required this.Subcategory,
+  });
 }

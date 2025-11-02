@@ -100,6 +100,7 @@ class _BookslistscreenState extends State<Bookslistscreen> {
               itemBuilder: (BuildContext context, int index) {
                 final myBooks = mybooks[index].data() as Map<String, dynamic>;
                 BookModel bookmodel = BookModel(
+                  id: myBooks['id'] ?? '',
                   title: myBooks['title'] ?? '',
                   category: myBooks['category'] ?? '',
                   images: List<String>.from(myBooks['images'] ?? []),

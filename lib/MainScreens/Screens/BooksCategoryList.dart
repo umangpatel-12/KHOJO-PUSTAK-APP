@@ -10,8 +10,16 @@ import 'BookDetailsScreen.dart';
 class BooksCategoryList extends StatefulWidget {
   final String categoryName;
   final String categoryId;
+  final String subcategoryId; // 👈 added
+  final String subcategoryName;
 
-  const BooksCategoryList({super.key, required this.categoryName, required this.categoryId});
+  const BooksCategoryList({
+    super.key,
+    required this.categoryName,
+    required this.categoryId,
+    required this.subcategoryId,
+    required this.subcategoryName,
+  });
 
   @override
   State<BooksCategoryList> createState() => _BooksCategoryListState();
@@ -39,7 +47,7 @@ class _BooksCategoryListState extends State<BooksCategoryList> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.green, size: 22),
         title: Text(
-          widget.categoryName,
+          widget.subcategoryName,
           style: TextStyle(
             fontSize: 18,
             color: Colors.green,
@@ -49,8 +57,10 @@ class _BooksCategoryListState extends State<BooksCategoryList> {
       ),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('Books')
-              .where('categoryId',isEqualTo: widget.categoryId)
+          stream: FirebaseFirestore.instance
+              .collection('Books')
+              .where('categoryId', isEqualTo: widget.categoryId)
+              .where('subcategoryId', isEqualTo: widget.subcategoryId) // 👈 filter by subcategory
               .snapshots(),
           builder: (context, snapshot) {
             // 🟢 STEP 1: Show Shimmer while loading
@@ -102,6 +112,7 @@ class _BooksCategoryListState extends State<BooksCategoryList> {
               itemBuilder: (BuildContext context, int index) {
                 final myBooks = mybooks[index].data() as Map<String, dynamic>;
                 BookModel bookmodel = BookModel(
+                  id: myBooks['id'] ?? '',
                   title: myBooks['title'] ?? '',
                   category: myBooks['category'] ?? '',
                   images: List<String>.from(myBooks['images'] ?? []),
@@ -112,7 +123,7 @@ class _BooksCategoryListState extends State<BooksCategoryList> {
                   price: myBooks['price'] ?? 0.0,
                   userId: myBooks['userId'] ?? '',
                   author: myBooks['author'] ?? 'Unknown',
-                  originalPrice: myBooks['originalPrice'],
+                  originalPrice: myBooks['originalPrice'] ?? 0,
                 );
 
                 return Container(
