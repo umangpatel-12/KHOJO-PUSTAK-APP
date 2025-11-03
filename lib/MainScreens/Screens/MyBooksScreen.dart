@@ -16,66 +16,6 @@ class _MyBooksScreenState extends State<MyBooksScreen> {
   List<Map<String, String>> boughtBooks = [];
 
   @override
-  void initState() {
-    super.initState();
-    _fetchBooks();
-  }
-
-  // Simulate fetching data from database
-  Future<void> _fetchBooks() async {
-    await Future.delayed(const Duration(seconds: 2)); // simulate delay
-
-    sellingBooks = [
-      {
-        "title": "Data Structures and Algorithms",
-        "author": "Cormen, Leiserson",
-        "price": "₹899",
-        "oldPrice": "₹1299",
-        "condition": "Excellent",
-        "status": "Active",
-        "imageUrl":
-        "https://images.unsplash.com/photo-1553729784-e91953dec042",
-        "views": "45",
-        "chats": "8",
-        "time": "3 days ago",
-      },
-      {
-        "title": "Engineering Mathematics",
-        "author": "B.S. Grewal",
-        "price": "₹599",
-        "oldPrice": "₹699",
-        "condition": "Good",
-        "status": "Sold",
-        "imageUrl":
-        "https://images.unsplash.com/photo-1512820790803-83ca734da794",
-        "views": "89",
-        "chats": "15",
-        "time": "1 week ago",
-      },
-    ];
-
-    boughtBooks = [
-      {
-        "title": "Operating System Concepts",
-        "author": "Silberschatz",
-        "price": "₹499",
-        "oldPrice": "₹899",
-        "condition": "Good",
-        "status": "Bought",
-        "imageUrl":
-        "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f",
-        "views": "12",
-        "chats": "3",
-        "time": "2 weeks ago",
-      },
-    ];
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     // Choose current list based on tab
     List<Map<String, String>> currentList =

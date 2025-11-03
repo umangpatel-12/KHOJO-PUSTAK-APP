@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:khojpustak/MainScreens/Screens/PhoneAuthScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'MainScreens/Authentication/LoginScreen.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: isLoggedIn ? CustomBottomNavBar() : LoginScreen(),
+      // home: PhoneAuthPage(),
     );
   }
 }

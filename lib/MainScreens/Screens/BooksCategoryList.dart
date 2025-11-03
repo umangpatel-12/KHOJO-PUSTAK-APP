@@ -187,22 +187,22 @@ class _BooksCategoryListState extends State<BooksCategoryList> {
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              const Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
                                       Text(
-                                        '₹499',
-                                        style: TextStyle(
+                                        '₹${myBooks['price'] ?? ''}',
+                                        style: const TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.green,
                                         ),
                                       ),
-                                      SizedBox(width: 8),
+                                      const SizedBox(width: 8),
                                       Text(
-                                        '₹699',
+                                        '₹${myBooks['originalPrice'] ?? ''}',
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.grey,

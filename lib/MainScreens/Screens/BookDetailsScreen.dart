@@ -219,19 +219,20 @@ Check out this amazing book on Khojo Pustak! 🔥
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
                   // ✅ Price
                   Row(
                     children: [
-                      Text("₹ ${book.price} ",
+                      Text("₹${book.price} ",
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16,color: Colors.green)),
+                              fontWeight: FontWeight.bold, fontSize: 20,color: Colors.green)),
                       const SizedBox(width: 6),
                       Text(
                         "₹${book.originalPrice}",
                         style: TextStyle(
                             color: Colors.grey,
+                            fontSize: 14,
                             decoration: TextDecoration.lineThrough),
                       ),
                       SizedBox(width: 16,),

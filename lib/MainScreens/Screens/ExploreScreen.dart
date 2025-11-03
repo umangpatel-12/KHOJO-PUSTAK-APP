@@ -195,7 +195,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
                           // ✅ Safely extract all fields
                           BookModel bookmodel = BookModel(
-                            id: data['id'],
+                            id: book.id,
                             title: data['title'] ?? '',
                             category: data['category'] ?? '',
                             images: List<String>.from(data['images'] ?? []),
@@ -296,12 +296,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                       const SizedBox(height: 4),
                                       Row(
                                         children: [
-                                          Text("₹${book['price'] ?? ''}",
+                                          Text("₹${bookmodel.price}",
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold, fontSize: 14,color: Colors.green)),
                                           const SizedBox(width: 6),
                                           Text(
-                                            "₹${book['originalPrice'] ?? ''}",
+                                            "₹${bookmodel.originalPrice}",
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 11,

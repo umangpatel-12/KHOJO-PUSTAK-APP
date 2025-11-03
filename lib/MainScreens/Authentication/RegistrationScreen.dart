@@ -100,18 +100,18 @@ class _RegistrationscreenState extends State<Registrationscreen> {
   ////////////////////Firebase Authentication////////////////////
   Future<void> _registerUser() async {
     if(_formKey.currentState!.validate())
-      {
-        setState(() {
-          _loading = true;
-        });
-      }
+    {
+      setState(() {
+        _loading = true;
+      });
+    }
 
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _email.text.trim(),
-          password: _password.text.trim(),
+        email: _email.text.trim(),
+        password: _password.text.trim(),
       );
-      
+
       if (credential.user != null) {
         // Save extra Details in Firebase Firestore
         FirebaseFirestore.instance
@@ -171,7 +171,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
   }
 
   /////////////////// Google Authentication ////////////////////
-  
+
 
   /////////////////// Facebook Authentication ////////////////////
 
