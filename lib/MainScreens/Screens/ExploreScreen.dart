@@ -148,7 +148,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               stream: _selectedCategoryId.isEmpty
                   ? FirebaseFirestore.instance
                   .collection('Books')
-                  .orderBy('title')
                   .snapshots()
                   : FirebaseFirestore.instance
                   .collection('Books')
@@ -167,11 +166,25 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 }
 
                 // final books = asyncSnapshot.data!.docs;
-                final books = asyncSnapshot.data!.docs.where((doc) {
-                  final title = doc['title'].toString().toLowerCase();
-                  final query = _searchController.text.toLowerCase();
-                  return title.contains(query);
+                // Search Logic's
+                final query = _searchController.text.trim().toLowerCase();
+                final books = asyncSnapshot.data!.docs.where((doc){
+                  final data = doc.data() as Map<String, dynamic>;
+                  final title = data['title']?.toString().toLowerCase() ?? '';
+                  final category = data['category']?.toString().toLowerCase() ?? '';
+                  final subcategory = data['subcategory']?.toString().toLowerCase() ?? '';
+                  final author = data['author']?.toString().toLowerCase() ?? '';
+
+                  return title.contains(query) ||
+                      category.contains(query) ||
+                      subcategory.contains(query) ||
+                      author.contains(query);
                 }).toList();
+                // final books = asyncSnapshot.data!.docs.where((doc) {
+                //   final title = doc['title'].toString().toLowerCase();
+                //   final query = _searchController.text.toLowerCase();
+                //   return title.contains(query);
+                // }).toList();
 
                 if (books.isEmpty) {
                   return SliverToBoxAdapter(
@@ -179,7 +192,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(50.0),
                         child: Text(
-                          'No books found in this category 😕',
+                          'No books found in this search 😕',
                           style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                         ),
                       ),
